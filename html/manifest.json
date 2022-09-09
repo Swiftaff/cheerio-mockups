@@ -1,0 +1,15 @@
+{
+  "originalUrl": "https://www.wikipedia.org/",
+  "title": "Wikipedia",
+  "archiveTime": "2022-09-09T11:59:29.935Z",
+  "indexFilename": "index.html",
+  "resources": {
+    "images/0.svg": "https://www.wikipedia.org/portal/wikipedia.org/assets/img/sprite-e99844f6.svg",
+    "images/3.png": "https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikinews-logo_sister.png",
+    "images/4.png": "https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikinews-logo_sister@2x.png",
+    "images/6.ico": "https://www.wikipedia.org/static/favicon/wikipedia.ico",
+    "images/7.png": "https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2.png",
+    "images/1.png": "https://www.wikipedia.org/portal/wikipedia.org/assets/img/noimage.png",
+    "images/2.svg": "https://www.wikipedia.org/portal/wikipedia.org/assets/img/noimage.svg"
+  }
+}

@@ -4,13 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "run": "node index"
   },
   "author": "swiftaff@gmail.com",
   "license": "MIT",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "playwright": "^1.25.2",
-    "single-file-cli": "github:gildas-lormeau/single-file-cli"
+    "playwright": "^1.25.2"
   }
 }
