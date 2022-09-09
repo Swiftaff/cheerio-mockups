@@ -4,12 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node index"
+    "start": "sirv html --port 3000",
+    "watch": "nodemon -w test.js -e node index"
   },
   "author": "swiftaff@gmail.com",
   "license": "MIT",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "playwright": "^1.25.2"
+    "nodemon": "^2.0.19",
+    "playwright": "^1.25.2",
+    "sirv-cli": "^2.0.2"
   }
 }
