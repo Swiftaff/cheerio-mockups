@@ -4,20 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "sirv html --port 3000",
-    "watch": "nodemon -w test.js -e node index"
+    "start_html_server": "sirv html --port 3000",
+    "start_watcher_ws_server": "node server",
+    "manually_run_cheerio": "node index"
   },
   "author": "swiftaff@gmail.com",
   "license": "MIT",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "chokidar": "^3.5.3",
-    "express": "^4.18.1",
-    "node-static": "^0.7.11",
-    "nodemon": "^2.0.19",
     "playwright": "^1.25.2",
     "sirv-cli": "^2.0.2",
-    "sockjs": "^0.3.24",
     "ws": "^8.8.1"
   }
 }
