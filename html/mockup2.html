@@ -1615,7 +1615,7 @@
             <img class="central-featured-logo" src="images/7.png" srcset="" alt="Wikipedia" sizes="" width="200" height="183">
             <h1 class="central-textlogo-wrapper">
                 <span class="central-textlogo__image sprite svg-Wikipedia_wordmark"> Wikipedia </span>
-                <strong class="jsl10n localized-slogan" data-jsl10n="portal.slogan">Hello there!123456</strong>
+                <strong class="jsl10n localized-slogan" data-jsl10n="portal.slogan">Hello again!!!</strong>
             </h1>
         </div>
         <div class="central-featured" data-el-section="primary links">
@@ -2474,37 +2474,39 @@
     
 
 <script>
-websocket_listener();
+    websocket_listener();
 
-function websocket_listener() {
-    // TODO: only run this on localhost - to avoid it causing issues if left in by mistake when previewed on a real domain
-    
-    console.log("websocket_listener",window.location.hostname);
+    function websocket_listener() {
+        // Only run this on localhost - to avoid it causing issues if left in by mistake when previewed on a real domain
 
-    let socket = new WebSocket("ws://localhost:8080");
+        if (window.location.hostname == "localhost") {
+            let socket = new WebSocket("ws://localhost:8080");
 
-    socket.onopen = function (e) {
-        console.log("[open] Connection established");
-    };
+            socket.onopen = function (e) {
+                console.log("[open] Connection established");
+            };
 
-    socket.onmessage = function (event) {
-        console.log("[message] received from server: " + event.data);
-        location.reload(true);
-    };
+            socket.onmessage = function (event) {
+                console.log("[message] received from server: " + event.data);
+                location.reload(true);
+            };
 
-    socket.onerror = function (error) {
-        console.log("[error] " + error.message);
-    };
+            socket.onerror = function (error) {
+                console.log("[error] " + error.message);
+            };
 
-    socket.onclose = function (event) {
-        if (event.wasClean) {
-            console.log("[close] Connection closed cleanly, code=" + event.code + " reason=" + event.reason);
-        } else {
-            // e.g. server process killed or network down
-            // event.code is usually 1006 in this case
-            console.log("[close] Connection died - attempting to reload ws connection...");
+            socket.onclose = function (event) {
+                if (event.wasClean) {
+                    console.log("[close] Connection closed cleanly, code=" + event.code + " reason=" + event.reason);
+                } else {
+                    // e.g. server process killed or network down
+                    // event.code is usually 1006 in this case
+                    console.log("[close] Connection died - attempting to reload ws connection...");
+                }
+                websocket_listener();
+            };
         }
-        websocket_listener();
-    };
-}
-</script></body></html>
+    }
+</script>
+<button>Test button</button>
+</body></html>

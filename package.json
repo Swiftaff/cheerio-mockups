@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start_html_server": "sirv html --port 3000",
-    "start_watcher_ws_server": "node server",
-    "manually_run_cheerio": "node index"
+    "auto_dev": "node src/server",
+    "manually_start_html_server": "sirv html --port 3000",
+    "manually_build_html_files": "node src/build"
   },
   "author": "swiftaff@gmail.com",
   "license": "MIT",
