@@ -1,21 +1,19 @@
-// Server for Hot Reloading Web Pages
+// Simple websocker Server for Hot Reloading Web Pages
+// Builds html files, and tells the browser to refresh and show the latest designs automatically!
 //
-// This is a simple websocket server
-// with two watchers set up.
+// Has two watchers set up:
 //
 // #1 watches 'test.js' for any changes
 // which runs the 'node src/build' script
-// which builds the mockup .html files in 'html' based on test.js
+// which builds the mockup .html files in 'html' based on `mockups.js`
 //
 // #2 watches 'html' folder once those files have been built
-// triggering a websocket message to the browser, to request it to refresh
-//
-// So this server just tells the browser to refresh and show the latest designs automatically!
+// restarting webserver, and triggering a websocket message to the browser, to request it to refresh
+
 os = require("os");
 const chokidar = require("chokidar");
 const WebSocket = require("ws");
 const { spawn, exec } = require("child_process");
-const command = "node src/build";
 let server;
 serve();
 
@@ -62,9 +60,11 @@ wss.on("connection", (ws) => {
     if (watcher) watcher.close();
     watcher = chokidar.watch("./html", pause_after_refresh);
     watcher.on("change", (event, path) => {
-        console.log("ws message sent: html has been updated - please refresh!");
-        if (!refreshed) ws.send("html has been updated - please refresh!");
-        refreshed = true;
+        setTimeout(() => {
+            console.log("ws message sent: html has been updated - please refresh!");
+            if (!refreshed) ws.send("html has been updated - please refresh!");
+            refreshed = true;
+        }, 500); //wait to allow pages to be regenerated
     });
 });
 
