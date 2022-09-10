@@ -14,4 +14,20 @@ module.exports = [
             return $;
         },
     },
+    {
+        name: "mockup3",
+        instructions: ($, $$) => {
+            $(".jsl10n.localized-slogan").text("Hello again!!!");
+            $("body").append($$("test_template.html"));
+            return $;
+        },
+    },
+    {
+        name: "mockup4",
+        instructions: ($, $$) => {
+            $(".jsl10n.localized-slogan").text("Hello again!!!");
+            $("body").append($$("test_template.html"));
+            return $;
+        },
+    },
 ];

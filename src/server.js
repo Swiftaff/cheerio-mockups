@@ -5,19 +5,19 @@
 //
 // #1 watches 'test.js' for any changes
 // which runs the 'node src/build' script
-// which builds the mockup 'indexNNN.html' files in 'html' based on test.js
+// which builds the mockup .html files in 'html' based on test.js
 //
 // #2 watches 'html' folder once those files have been built
 // triggering a websocket message to the browser, to request it to refresh
 //
 // So this server just tells the browser to refresh and show the latest designs automatically!
-
+os = require("os");
 const chokidar = require("chokidar");
 const WebSocket = require("ws");
-const { spawn } = require("child_process");
+const { spawn, exec } = require("child_process");
 const command = "node src/build";
 let server;
-//serve();
+serve();
 
 const pause_after_refresh = {
     // pause after a refresh to avoid recursive calling
@@ -29,26 +29,27 @@ const pause_after_refresh = {
 
 chokidar.watch("./src", pause_after_refresh).on("change", (event, path) => {
     console.log("a file in 'src' folder was changed");
-    spawn(
-        command,
+    exec(
+        "node src/build",
         {
             stdio: ["ignore", "inherit", "inherit"],
             shell: true,
         },
         (error, stdout, stderr) => {
             if (error) {
-                console.log(`'${command}' error: ${error}`);
+                console.log(`build: error: ${error}`);
                 return;
             }
             if (stderr) {
                 console.log(`File system error: ${stderr}`);
                 return;
             }
-            console.log(stdout);
+            if (stdout) {
+                console.log(stdout);
+            }
+            serve();
         }
     );
-
-    //serve();
 });
 
 const wss = new WebSocket.Server({ port: 8080 });
@@ -68,16 +69,63 @@ wss.on("connection", (ws) => {
 });
 
 function serve() {
-    function toExit() {
-        if (server) server.kill(0);
+    if (server) {
+        console.log(server.pid);
+
+        if (os.platform() === "win32") {
+            console.log("killing");
+            exec(
+                "taskkill /pid " + server.pid + " /T /F",
+                {
+                    stdio: ["ignore", "inherit", "inherit"],
+                    shell: true,
+                },
+                (error, stdout, stderr) => {
+                    if (error) {
+                        console.log(`taskkill error: ${error}`);
+                        return;
+                    }
+                    if (stderr) {
+                        console.log(`File system error: ${stderr}`);
+                        return;
+                    }
+                    if (stdout) {
+                        console.log(stdout);
+                    }
+                }
+            );
+            server = null;
+        } else {
+            server.kill(0);
+        }
+
+        setTimeout(() => {
+            serve();
+        }, 1000);
+    } else {
+        server = spawn(
+            "sirv",
+            ["html", "--port", "3000"],
+            {
+                stdio: ["ignore", "inherit", "inherit"],
+                shell: true,
+            },
+            (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`sirv error: ${error}`);
+                    return;
+                }
+                if (stderr) {
+                    console.log(`File system error: ${stderr}`);
+                    return;
+                }
+                if (stdout) {
+                    console.log(stdout);
+                }
+            }
+        );
+        //server.on("SIGTERM", toExit);
+        //server.on("exit", toExit);
+        //server.on("close", toExit);
     }
-
-    toExit();
-    server = require("child_process").spawn("npm", ["run", "manually_start_html_server"], {
-        stdio: ["ignore", "inherit", "inherit"],
-        shell: true,
-    });
-
-    process.on("SIGTERM", toExit);
-    process.on("exit", toExit);
 }

@@ -15,29 +15,41 @@
 
 ## Make one or more copies of the page with your mockup changes using cheerio script
 
-2. Start development server `npm run auto_dev`
-3. open `original.html` in browser to check html server is running
-4. Edit the `src/mockups.js` file to determine the changes you want to make to one or more mockups.
-
-    Saving should hot reload the browser, except when you add new mockups, then you will need to restart the html server so it can find them first.
+1. Start development server `npm run auto_dev`
+1. open `http://localhost:3000/original.html` in browser to check html server is running
+1. Edit the `src/mockups.js` file to define the changes you want to make for one or more mockups, and open those urls in a browser, e.g. `http://localhost:3000/mockup1.html`
 
     ```js
-    {
-        name: "mockup1",
-        instructions: ($,get_template_as_html) => {
+    module.exports = [
+        // first mockup definition will auto-create a `mockup1.html` page
+        // using the `original.html` as a template and applying your cheerio
+        // commands below to make any changes you want
+        // including any new snippets of html
+        {
+            name: "mockup1",
+            instructions: ($, $$) => {
+                // $ = 'cheerio.js' which is like jquery for static html
 
-            // $ = 'cheerio.js' which is like jquery for static html
+                //your cheerio instructions go here
+                $(".jsl10n.localized-slogan").text("Hello there!!");
 
-            // get_template_as_html = a helper function that takes the string
-            // name of a file from your 'src' directory
-            // which should have a snippet of html, like a button etc
-            // e.g. get_template_as_html("my_template.html")
+                // $$ = a helper function which gets a snippet of html
+                // from a file from your 'src' directory,
+                // e.g. `<button>Test button</button>`
+                $("body").append($$("test_template.html"));
 
-            //your instructions go here
-            $(".jsl10n.localized-slogan").text("Hello there!!");
-
-            // return the cheerio object
-            return $;
+                // return the cheerio object
+                return $;
+            },
         },
-    }
+        { ... },
+    ];
     ```
+
+1. Saving this or any files in the 'src' folder should hot reload the browser
+1. TODO auto-create index page to link mockups from
+
+## Use the resulting HTML mockups
+
+1. Manually take screengrabs of e.g. desktop and tablet sizes and send for review - TODO take automated screengrabs using playwright - TODO display thumbnails in automated index file - or in a PDF template
+1. Manually create a zip file from `html` folder, and send or upload these somewhere for review - TODO automate zip file creation
