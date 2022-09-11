@@ -20,6 +20,10 @@ console.log("args", process.argv);
 
 let options = {
     input: path.join(__dirname, process.argv[2] || ""),
+    output: path.join(__dirname, "../html"),
+    ws: {
+        port: 8080,
+    },
 };
 
 let server;
@@ -37,11 +41,11 @@ function watch() {
     };
 
     chokidar.watch(options.input, pause_after_refresh).on("change", (event, path) => {
-        console.log("a file in 'src' folder was changed");
+        console.log(`a file in "${options.input}" folder was changed`);
         build();
     });
 
-    const wss = new WebSocket.Server({ port: 8080 });
+    const wss = new WebSocket.Server(options.ws);
     console.log("ws_server: started");
 
     let watcher;
@@ -49,7 +53,7 @@ function watch() {
         console.log("ws_server: connection from browser");
         let refreshed = false;
         if (watcher) watcher.close();
-        watcher = chokidar.watch("./html", pause_after_refresh);
+        watcher = chokidar.watch(options.output, pause_after_refresh);
         watcher.on("change", (event, path) => {
             setTimeout(() => {
                 console.log("ws_server: html has been updated: " + event);
@@ -123,7 +127,7 @@ function serve() {
 
 function build() {
     exec(
-        `node src/build "${options.input}"`,
+        `node src/build "${options.input}" "${options.output}"`,
         {
             stdio: ["ignore", "inherit", "inherit"],
             shell: true,

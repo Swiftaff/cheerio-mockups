@@ -6,6 +6,7 @@ console.log(process.argv);
 
 let options = {
     input: process.argv[2],
+    output: process.argv[3],
 };
 
 const mockup_instructions = require(path.join(options.input, "config.js"));
@@ -18,11 +19,14 @@ let filenames = [];
 
 mockup_instructions.forEach((mockup, m) => {
     // get original HTML
-    const file_data = fs.readFileSync("html/original.html", { encoding: "utf8", flag: "r" });
+    const file_data = fs.readFileSync(path.join(options.output, "original.html"), { encoding: "utf8", flag: "r" });
     let $ = cheerio.load(file_data);
 
     // inject hot reloader
-    const hot_reloader = fs.readFileSync("src/browser_hot_reloader.html", { encoding: "utf8", flag: "r" });
+    const hot_reloader = fs.readFileSync(path.join(options.input, "browser_hot_reloader.html"), {
+        encoding: "utf8",
+        flag: "r",
+    });
     $("body").append($.html(hot_reloader));
 
     // Perform instructions for this mockup
@@ -33,10 +37,10 @@ mockup_instructions.forEach((mockup, m) => {
     //console.log(output_html);
     let filename = mockup.name || "index" + m;
     filenames.push(filename);
-    fs.writeFileSync(`html/${filename}.html`, output_html);
+    fs.writeFileSync(path.join(options.output, `${filename}.html`), output_html);
 });
 
 function get_template_as_html(template_filename) {
-    const file_data = fs.readFileSync(`src/${template_filename}`, { encoding: "utf8", flag: "r" });
+    const file_data = fs.readFileSync(path.join(options.input, template_filename), { encoding: "utf8", flag: "r" });
     return file_data;
 }
