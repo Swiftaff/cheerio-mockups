@@ -8,8 +8,9 @@ let options = {
     input: process.argv[2],
     output: process.argv[3],
 };
-
-const mockup_instructions = require(path.join(options.input, "config.js"));
+let config = path.join(options.input, "config.js");
+console.log("config", options);
+const mockup_instructions = require(config);
 
 if (!Array.isArray(mockup_instructions)) {
     mockup_instructions = [mockup_instructions];
@@ -23,7 +24,7 @@ mockup_instructions.forEach((mockup, m) => {
     let $ = cheerio.load(file_data);
 
     // inject hot reloader
-    const hot_reloader = fs.readFileSync(path.join(options.input, "browser_hot_reloader.html"), {
+    const hot_reloader = fs.readFileSync(path.join(__dirname, "browser_hot_reloader.html"), {
         encoding: "utf8",
         flag: "r",
     });

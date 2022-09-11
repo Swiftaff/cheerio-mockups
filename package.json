@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "auto_dev": "node src/server",
+    "auto_dev": "node src/server \"../\"",
     "manually_start_html_server": "sirv html --port 3000",
     "manually_build_html_files": "node src/build"
   },

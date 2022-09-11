@@ -39,6 +39,8 @@ let options = {
     },
 };
 
+console.log(options);
+
 let server;
 watch();
 build();
@@ -133,7 +135,7 @@ function serve() {
 
 function build() {
     exec(
-        `node src/build "${options.input}" "${options.output}"`,
+        `node src/build ${options.input} ${options.output}`,
         {
             stdio: ["ignore", "inherit", "inherit"],
             shell: true,
