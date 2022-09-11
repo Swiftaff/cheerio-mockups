@@ -1,7 +1,14 @@
 const cheerio = require("cheerio");
 const fs = require("fs");
+const path = require("path");
 
-const mockup_instructions = require("./config.js");
+console.log(process.argv);
+
+let options = {
+    input: process.argv[2],
+};
+
+const mockup_instructions = require(path.join(options.input, "config.js"));
 
 if (!Array.isArray(mockup_instructions)) {
     mockup_instructions = [mockup_instructions];
