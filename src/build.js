@@ -1,7 +1,7 @@
 const cheerio = require("cheerio");
 const fs = require("fs");
 
-const mockup_instructions = require("./mockups.js");
+const mockup_instructions = require("./config.js");
 
 if (!Array.isArray(mockup_instructions)) {
     mockup_instructions = [mockup_instructions];

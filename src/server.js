@@ -104,7 +104,7 @@ function serve() {
             serve();
         }, 1000);
     } else {
-        console.log();
+        console.log("---------------------------------------------");
         console.log("html_server: started on http://localhost:3000");
         server = spawn(
             "sirv html --port 3000 --dev --quiet",
