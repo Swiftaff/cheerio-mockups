@@ -30,7 +30,6 @@ mockup_instructions.forEach((mockup, m) => {
 });
 
 function get_template_as_html(template_filename) {
-    console.log("get_template_as_html", template_filename);
     const file_data = fs.readFileSync(`src/${template_filename}`, { encoding: "utf8", flag: "r" });
     return file_data;
 }
