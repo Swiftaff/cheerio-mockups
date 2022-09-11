@@ -4,7 +4,7 @@ module.exports = [
         name: "test",
         testy: "testy",
         instructions: function ($, $$) {
-            $("h1").text("Hello there!!");
+            $("h1").text("Hello there!");
             return $;
         },
     },

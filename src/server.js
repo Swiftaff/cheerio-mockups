@@ -16,13 +16,26 @@ const chokidar = require("chokidar");
 const WebSocket = require("ws");
 const { spawn, exec } = require("child_process");
 
+const chokidar_settings = {
+    // pause after a refresh to avoid recursive calling
+    awaitWriteFinish: {
+        stabilityThreshold: 400,
+        pollInterval: 400,
+    },
+};
+
 console.log("args", process.argv);
 
 let options = {
     input: path.join(__dirname, process.argv[2] || ""),
     output: path.join(__dirname, "../html"),
+    port: 3000,
     ws: {
         port: 8080,
+    },
+    chokidar: {
+        input: chokidar_settings,
+        output: chokidar_settings,
     },
 };
 
@@ -32,15 +45,8 @@ build();
 serve();
 
 function watch() {
-    const pause_after_refresh = {
-        // pause after a refresh to avoid recursive calling
-        awaitWriteFinish: {
-            stabilityThreshold: 400,
-            pollInterval: 400,
-        },
-    };
-
-    chokidar.watch(options.input, pause_after_refresh).on("change", (event, path) => {
+    let input_chokidar = chokidar.watch(options.input, options.chokidar.input);
+    input_chokidar.on("change", (event, path) => {
         console.log(`a file in "${options.input}" folder was changed`);
         build();
     });
@@ -48,13 +54,13 @@ function watch() {
     const wss = new WebSocket.Server(options.ws);
     console.log("ws_server: started");
 
-    let watcher;
+    let output_watcher;
     wss.on("connection", (ws) => {
         console.log("ws_server: connection from browser");
         let refreshed = false;
-        if (watcher) watcher.close();
-        watcher = chokidar.watch(options.output, pause_after_refresh);
-        watcher.on("change", (event, path) => {
+        if (output_watcher) output_watcher.close();
+        output_watcher = chokidar.watch(options.output, options.chokidar.input);
+        output_watcher.on("change", (event, _path) => {
             setTimeout(() => {
                 console.log("ws_server: html has been updated: " + event);
                 if (!refreshed) ws.send("html has been updated - please refresh!");
@@ -100,7 +106,7 @@ function serve() {
         console.log("---------------------------------------------");
         console.log("html_server: started on http://localhost:3000");
         server = spawn(
-            "sirv html --port 3000 --dev --quiet",
+            `sirv "${options.output}" --port ${options.port} --dev --quiet`,
             {
                 stdio: ["ignore", "inherit", "inherit"],
                 shell: true,
