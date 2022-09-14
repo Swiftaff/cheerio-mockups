@@ -18,7 +18,42 @@ Instead, this library keeps the original intact, and applies a list of changes f
 
 ## Instructions
 
-### Save the original page to update
+### Install
+
+1. Not saved to npm yet, so just reference a specific commit, e.g.
+
+```js
+npm i https://github.com/Swiftaff/cheerio-mockups#bee7ed29c1f8f4d1b988eb370911d75e43687561
+```
+
+1. create directories for input: `src` and output: `html`
+1. in `src` create a `mockups_config.js` file, with a basic config such as
+
+```js
+module.exports = {
+    input: "src",
+    output: "html",
+    original: "original.html",
+    mockups: [
+        {
+            name: "test",
+            instructions: function ($, $$) {
+                $("h1").text("Hello there!");
+                return $;
+            },
+        },
+    ],
+};
+```
+
+1. in `src` create an `index.js` file, calling the library and referencing the config file.
+
+```
+const mockups = require("cheerio-mockups");
+mockups("src/mockups_config.js");
+```
+
+### Save the original page from the site you wish to base the mockups from
 
 1. Install the Single-fileZ Firefox extension: https://addons.mozilla.org/firefox/addon/singlefilez
 1. Change extension Settings/options to avoid basic issues:
@@ -31,20 +66,26 @@ Instead, this library keeps the original intact, and applies a list of changes f
 1. Fix any minor markup validation issues
 1. Rename the `index.html` to `original.html` - this page will form the basis of all your mockup variants of this page (see wikipedia example)
 
-### Make one or more mockup variants of the page using [https://cheerio.js.org/](cheerio.js) script
+### Run the dev server and start making one or more mockup variants of the page using [https://cheerio.js.org/](cheerio.js) script
 
-1. Start development server `npm run auto_dev`
-1. open `http://localhost:3000/original.html` in browser to check html server is running and the page still looks ok
+1. Start development server `node src/index.js`
+1. open `http://localhost:3000/original.html` in browser to check html server is running and the original page still looks ok
 1. Now is a good time to `git init` and commit your changes before continuing
-1. Edit the `src/mockups.js` file to define the changes you want to make for one or more mockups, and open those urls in a browser, e.g. `http://localhost:3000/mockup1.html`
+1. Edit the `src/mockups_config.js` file to define the changes you want to make for one or more mockups, and open those urls in a browser, e.g. `http://localhost:3000/mockup1.html`
 
     ```js
-    module.exports = [
+    module.exports = {
+        // general settings
+        input: "src",
+        output: "html",
+        original: "original.html",
+
         // first mockup definition will auto-create a `mockup1.html` page
         // using the `original.html` as a template and applying your cheerio
         // commands below to make any changes you want
         // including any new snippets of html
-        {
+        mockups:[
+            {
             name: "mockup1",
             instructions: ($, $$) => {
                 // $ = 'cheerio.js' which is like jquery for static html
@@ -63,7 +104,8 @@ Instead, this library keeps the original intact, and applies a list of changes f
         },
         //other mockup variants
         { ... },
-    ];
+        ]
+    };
     ```
 
 1. Saving this or any files in the 'src' folder should hot reload the browser
