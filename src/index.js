@@ -19,8 +19,6 @@ const build = require("./build.js");
 
 module.exports = function (config_filepath = "mockups_config.js") {
     let server;
-    let config = [];
-    let config_count = 0;
     let options = get_options();
     watch();
     build(options);
@@ -122,13 +120,7 @@ module.exports = function (config_filepath = "mockups_config.js") {
         //    flag: "r",
         //});
         //const config = JSON.parse(config_txt);
-        config_count++;
-        config.push({});
-        let dodgy = new Array(config_count).fill(["/test", "../"]).flat();
-        let path_args = [process.cwd(), dodgy, config_filepath].flat();
-        console.log("## get_options", path_args, config[config_count - 1], config_count);
-        config[config_count - 1] = require(path.join(...path_args));
-        console.log(config_filepath);
+        const config = require(path.join(process.cwd(), config_filepath));
         return {
             mockups: [],
             input: "",
@@ -152,7 +144,7 @@ module.exports = function (config_filepath = "mockups_config.js") {
                     },
                 },
             },
-            ...config[config_count - 1],
+            ...config,
         };
     }
 };
