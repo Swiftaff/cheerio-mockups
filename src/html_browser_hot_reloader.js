@@ -1,4 +1,4 @@
-<script>
+module.exports = `<script>
     websocket_listener();
 
     function websocket_listener() {
@@ -32,4 +32,4 @@
             };
         }
     }
-</script>
+</script>`;
