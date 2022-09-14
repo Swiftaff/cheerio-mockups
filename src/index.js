@@ -15,23 +15,23 @@ const os = require("os");
 const chokidar = require("chokidar");
 const WebSocket = require("ws");
 const { spawn, exec } = require("child_process");
-const build = require("./build.js");
 
 module.exports = function (config_filepath = "mockups_config.js") {
     let server;
+    let config_path = path.join(process.cwd(), config_filepath);
     let options = get_options();
+    let input_path = path.join(process.cwd(), options.input);
+    let output_path = path.join(process.cwd(), options.output);
     watch();
-    build(options);
+    build();
     serve();
 
     function watch() {
-        let input_path = path.join(process.cwd(), options.input);
         let input_watcher = chokidar.watch(input_path, options.chokidar.input);
         console.log("input_path", input_path);
         input_watcher.on("change", (event, path) => {
             console.log(`a file in "${options.input}" folder was changed`);
-            options = get_options();
-            build(options);
+            build();
             serve();
         });
 
@@ -43,7 +43,6 @@ module.exports = function (config_filepath = "mockups_config.js") {
             console.log("ws_server: connection from browser");
             let refreshed = false;
             if (output_watcher) output_watcher.close();
-            let output_path = path.join(process.cwd(), options.output);
             output_watcher = chokidar.watch(output_path, options.chokidar.input);
             console.log("output_path", output_path);
             output_watcher.on("change", (event, _path) => {
@@ -115,12 +114,7 @@ module.exports = function (config_filepath = "mockups_config.js") {
     }
 
     function get_options() {
-        //const config_txt = fs.readFileSync(path.join(process.cwd(), config_filepath), {
-        //    encoding: "utf8",
-        //    flag: "r",
-        //});
-        //const config = JSON.parse(config_txt);
-        const config = require(path.join(process.cwd(), config_filepath));
+        const config = require(config_path);
         return {
             mockups: [],
             input: "",
@@ -146,5 +140,28 @@ module.exports = function (config_filepath = "mockups_config.js") {
             },
             ...config,
         };
+    }
+
+    function build() {
+        exec(
+            `node node_modules/cheerio-mockups/src/build ${input_path} ${output_path} ${config_path} ${options.original}`,
+            {
+                stdio: ["ignore", "inherit", "inherit"],
+                shell: true,
+            },
+            (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`build: error: ${error}`);
+                    return;
+                }
+                if (stderr) {
+                    console.log(`File system error: ${stderr}`);
+                    return;
+                }
+                if (stdout) {
+                    console.log(stdout);
+                }
+            }
+        );
     }
 };
