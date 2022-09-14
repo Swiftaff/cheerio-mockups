@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
+    "example": "node example/index.js",
     "auto_dev": "node src/index",
     "manually_start_html_server": "sirv html --port 3000",
     "manually_build_html_files": "node src/build"

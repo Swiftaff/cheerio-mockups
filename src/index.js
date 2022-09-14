@@ -143,8 +143,14 @@ module.exports = function (config_filepath = "mockups_config.js") {
     }
 
     function build() {
+        let build_path = "node_modules/cheerio-mockups/src/build.js";
+        let build_path_exists = fs.existsSync(build_path);
+        if (!build_path_exists) {
+            //then probably calling this from example folder inside the module - in which case change path
+            build_path = "src/build.js";
+        }
         exec(
-            `node node_modules/cheerio-mockups/src/build ${input_path} ${output_path} ${config_path} ${options.original}`,
+            `node ${build_path} ${input_path} ${output_path} ${config_path} ${options.original}`,
             {
                 stdio: ["ignore", "inherit", "inherit"],
                 shell: true,
