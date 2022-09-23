@@ -1,13 +1,13 @@
 - container:
       - row:
             - col:
-                  - "btn btn-primary":
-                        - html: "testy"
+                  - btn btn-primary:
+                        - html: testy
             - col:
-                  - "btn btn-secondary":
-                        - html: "testy"
+                  - alert alert-primary:
+                        - html: testy mctestface
             - col:
-                  - "btn btn-primary":
-                        - html: "testy"
+                  - btn btn-primary:
+                        - html: testy
 - container-sm
 - container-md
