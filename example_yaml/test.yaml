@@ -1,7 +1,7 @@
 - container p-4:
       - row:
             - col:
-                  - button.btn btn-primary#id=tsty:
+                  - button.btn btn-primary#id=test type=button:
                         - html: testy
             - col:
                   - alert alert-primary:

@@ -37,7 +37,7 @@ module.exports = {
     mockups: [
         {
             name: "test",
-            instructions: function ($, $$) {
+            instructions: function ($, html, yaml) {
                 $("h1").text("Hello there!");
                 return $;
             },
@@ -87,16 +87,27 @@ mockups("src/mockups_config.js");
         mockups:[
             {
             name: "mockup1",
-            instructions: ($, $$) => {
+            instructions: ($, html, yaml) => {
                 // $ = 'cheerio.js' which is like jquery for static html
 
                 //your cheerio instructions go here
                 $(".jsl10n.localized-slogan").text("Hello there!!");
 
-                // $$ = a helper function which gets a snippet of html
-                // from a file from your 'src' directory,
+                // html = a helper function which gets a snippet of html
+                // from a file from your 'input' directory,
                 // e.g. `<button>Test button</button>`
-                $("body").append($$("test_template.html"));
+                $("body").append(html("test_template.html"));
+
+                // yaml = a helper function which reads a yaml file, to generate bootstrap code!
+                // from a file from your 'input' directory,
+                // e.g.
+                //- button.btn btn-primary#id=test type=button:
+                //    - html: test button
+                //
+                //will import
+                //<button class="btn btn-primary" id="test" type="button">test button</button>
+
+                $("body").prepend(yaml("test_template.yaml"));
 
                 // return the cheerio object
                 return $;

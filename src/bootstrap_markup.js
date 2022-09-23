@@ -328,7 +328,7 @@ const end = (tag) => `</${tag}>`;
 
 const bootstrap_markup = function (name, part, child_name) {
     let tag = "div";
-    let id = "";
+    let attributes = "";
 
     //change tag frmo div if provided at start of name, like "h2.classname"
     let tag_split = name.split(".");
@@ -340,14 +340,14 @@ const bootstrap_markup = function (name, part, child_name) {
     //get id if provided, like "classname#id=testy"
     let id_split = name.split("#");
     if (id_split.length > 1) {
-        tag = id_split[1];
+        attributes = id_split[1];
         name = id_split[0];
     }
     console.log();
     // if only part of the markup has been requested, provide start or end of the tag
     if (part) {
         if (part === "start") {
-            return start(tag) + name + '"' + id + ">";
+            return start(tag) + name + '"' + attributes + ">";
         } else {
             return end(tag);
         }
@@ -356,7 +356,15 @@ const bootstrap_markup = function (name, part, child_name) {
         if (name == "html") {
             return child_name;
         } else {
-            return start(tag) + name + '"' + id + ">" + (child_name ? bootstrap_markup(child_name) : "") + end("div");
+            return (
+                start(tag) +
+                name +
+                '"' +
+                attributes +
+                ">" +
+                (child_name ? bootstrap_markup(child_name) : "") +
+                end("div")
+            );
         }
     }
 };
