@@ -323,48 +323,40 @@ const tags = {
     ],
 };
 
-const end_div = `</div>`;
-const markup = {
-    // note: end is just the end of the first part of the tag rather than the close tag like most entries
-    div: { start: `<div class="`, end: `">` },
-};
+const start = (tag) => `<${tag} class="`;
+const end = (tag) => `</${tag}>`;
 
 const bootstrap_markup = function (name, part, child_name) {
-    // 1.a if markup contains a definition for the named element, use that
-    if (markup.hasOwnProperty(name)) {
-        // 2.a if only part of the markup has been requested, provide either start or end of the tag
-        if (part) {
-            return markup[name][part];
-            // 2.b otherwise provide the whole tag
+    let tag = "div";
+    let id = "";
+
+    //change tag frmo div if provided at start of name, like "h2.classname"
+    let tag_split = name.split(".");
+    if (tag_split.length > 1) {
+        tag = tag_split[0];
+        name = tag_split.slice(1).join(".");
+    }
+
+    //get id if provided, like "classname#id=testy"
+    let id_split = name.split("#");
+    if (id_split.length > 1) {
+        tag = id_split[1];
+        name = id_split[0];
+    }
+    console.log();
+    // if only part of the markup has been requested, provide start or end of the tag
+    if (part) {
+        if (part === "start") {
+            return start(tag) + name + '"' + id + ">";
         } else {
-            if (name == "html") {
-                return child_name;
-            } else {
-                return markup[name].start + (child_name ? bootstrap_markup(child_name) : "") + markup[name].end;
-            }
+            return end(tag);
         }
-        // 1.b otherwise assume it is a generic div and we can just use the supplied name as the class
+        // otherwise provide the whole tag
     } else {
-        // 3.a if only part of the markup has been requested, provide start or end of the tag
-        if (part) {
-            if (part === "start") {
-                return markup.div.start + name + markup.div.end;
-            } else {
-                return end_div;
-            }
-            // 3.a otherwise provide the whole tag
+        if (name == "html") {
+            return child_name;
         } else {
-            if (name == "html") {
-                return child_name;
-            } else {
-                return (
-                    markup.div.start +
-                    name +
-                    markup.div.end +
-                    (child_name ? bootstrap_markup(child_name) : "") +
-                    end_div
-                );
-            }
+            return start(tag) + name + '"' + id + ">" + (child_name ? bootstrap_markup(child_name) : "") + end("div");
         }
     }
 };
