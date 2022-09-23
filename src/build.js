@@ -88,9 +88,13 @@ function bootstrap_parser(doc, input = "") {
 
                 let not_an_index = isNaN(parseInt(key));
                 console.log(not_an_index, key);
-                if (not_an_index) output = output + bootstrap_markup(key, "start");
-                output = output + bootstrap_markup(element);
-                if (not_an_index) output = output + bootstrap_markup(key, "end");
+                if (not_an_index) {
+                    output = output + bootstrap_markup(key, null, element);
+                } else {
+                    output = output + bootstrap_markup(element);
+                }
+
+                //if (not_an_index) output = output + bootstrap_markup(key, "end");
             }
         }
     }

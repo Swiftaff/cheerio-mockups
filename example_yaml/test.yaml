@@ -2,12 +2,12 @@
       - row:
             - col:
                   - "btn btn-primary":
-                        - text: "testy"
+                        - html: "testy"
             - col:
                   - "btn btn-secondary":
-                        - text: "testy"
+                        - html: "testy"
             - col:
                   - "btn btn-primary":
-                        - text: "testy"
+                        - html: "testy"
 - container-sm
 - container-md

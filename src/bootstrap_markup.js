@@ -325,21 +325,23 @@ const tags = {
 
 const end_div = `</div>`;
 const markup = {
-    text: { start: "", end: "" },
-
     // note: end is just the end of the first part of the tag rather than the close tag like most entries
     div: { start: `<div class="`, end: `">` },
 };
 
-module.exports = function (name, part) {
+const bootstrap_markup = function (name, part, child_name) {
     // 1.a if markup contains a definition for the named element, use that
     if (markup.hasOwnProperty(name)) {
         // 2.a if only part of the markup has been requested, provide either start or end of the tag
         if (part) {
             return markup[name][part];
-            // 2.b otherwise provide the whole empty tag
+            // 2.b otherwise provide the whole tag
         } else {
-            return markup[name].start + markup[name].end;
+            if (name == "html") {
+                return child_name;
+            } else {
+                return markup[name].start + (child_name ? bootstrap_markup(child_name) : "") + markup[name].end;
+            }
         }
         // 1.b otherwise assume it is a generic div and we can just use the supplied name as the class
     } else {
@@ -350,9 +352,21 @@ module.exports = function (name, part) {
             } else {
                 return end_div;
             }
-            // 3.a otherwise provide the whole empty tag
+            // 3.a otherwise provide the whole tag
         } else {
-            return markup.div.start + name + markup.div.end + end_div;
+            if (name == "html") {
+                return child_name;
+            } else {
+                return (
+                    markup.div.start +
+                    name +
+                    markup.div.end +
+                    (child_name ? bootstrap_markup(child_name) : "") +
+                    end_div
+                );
+            }
         }
     }
 };
+
+module.exports = bootstrap_markup;
