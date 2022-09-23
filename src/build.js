@@ -58,12 +58,13 @@ function get_template_as_yaml_bootstrap(template_filename) {
         const doc = yaml.load(fs.readFileSync(path.join(options.input, template_filename), "utf8"));
         console.log("yaml - success");
         console.log(doc);
+        console.log();
         file_data = bootstrap_parser(doc);
     } catch (e) {
         console.log("yaml - error");
         console.log(e);
     }
-
+    console.log(file_data);
     return file_data;
 }
 
@@ -72,8 +73,25 @@ function bootstrap_parser(doc, input = "") {
     for (const key in doc) {
         if (Object.hasOwnProperty.call(doc, key)) {
             const element = doc[key];
-            console.log(key, element);
-            output = output + bootstrap_markup(element);
+            console.log();
+            console.log(key, element, typeof element);
+            if (key === "text") console.log("!!!key = string", key);
+            if (typeof element === "object") {
+                console.log("element = object", element);
+                let not_an_index = isNaN(parseInt(key));
+                console.log(not_an_index, key);
+                if (not_an_index) output = output + bootstrap_markup(key, "start");
+                output = bootstrap_parser(element, output);
+                if (not_an_index) output = output + bootstrap_markup(key, "end");
+            } else {
+                console.log("element = string", element);
+
+                let not_an_index = isNaN(parseInt(key));
+                console.log(not_an_index, key);
+                if (not_an_index) output = output + bootstrap_markup(key, "start");
+                output = output + bootstrap_markup(element);
+                if (not_an_index) output = output + bootstrap_markup(key, "end");
+            }
         }
     }
     return output;
