@@ -22,6 +22,7 @@ module.exports = function (config_filepath = "mockups_config.js") {
     let options = get_options();
     let input_path = path.join(process.cwd(), options.input);
     let output_path = path.join(process.cwd(), options.output);
+    let src_path = path.join(process.cwd(), "/src");
     watch();
     build();
     serve();
@@ -31,6 +32,14 @@ module.exports = function (config_filepath = "mockups_config.js") {
         console.log("input_path", input_path);
         input_watcher.on("change", (event, path) => {
             console.log(`a file in "${options.input}" folder was changed`);
+            build();
+            serve();
+        });
+
+        let src_watcher = chokidar.watch(src_path, options.chokidar.src);
+        console.log("src_path", src_path);
+        src_watcher.on("change", (event, path) => {
+            console.log(`a file in "cheerio-mockups/src" folder was changed`);
             build();
             serve();
         });
@@ -132,6 +141,12 @@ module.exports = function (config_filepath = "mockups_config.js") {
                     },
                 },
                 output: {
+                    awaitWriteFinish: {
+                        stabilityThreshold: 400,
+                        pollInterval: 400,
+                    },
+                },
+                src: {
                     awaitWriteFinish: {
                         stabilityThreshold: 400,
                         pollInterval: 400,

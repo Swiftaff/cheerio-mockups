@@ -1,0 +1,21 @@
+- container p-4:
+      - row:
+            - col:
+                  - button.btn btn-primary#id=test type=button:
+                        - html: testy
+            - col:
+                  - alert alert-primary:
+                        - html: testy mctestface
+            - col:
+                  - h4.:
+                        - html: heading start&nbsp;
+                        - span.badge bg-primary:
+                              - html: badge
+                        - html: "&nbsp;heading end"
+            - col:
+                  - button.btn btn-primary position-relative:
+                        - html: Notifications&nbsp;
+                        - span.badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success:
+                              - html: 5
+- container-sm
+- container-md
