@@ -323,43 +323,45 @@ const tags = {
     ],
 };
 
-const start = (tag) => `<${tag} class="`;
+const start = (tag) => `<${tag}`;
 const end = (tag) => `</${tag}>`;
 
-const bootstrap_markup = function (name, part, child_name) {
+const bootstrap_markup = function (class_name, part, child_name) {
     let tag = "div";
     let attributes = "";
 
-    //change tag frmo div if provided at start of name, like "h2.classname"
-    let tag_split = name.split(".");
+    // change tag frmo div if provided at start of name, like "h2.classname"
+    let tag_split = ("" + class_name).split(".");
     if (tag_split.length > 1) {
         tag = tag_split[0];
-        name = tag_split.slice(1).join(".");
+        class_name = tag_split.slice(1).join(".");
     }
 
-    //get id if provided, like "classname#id=testy"
-    let id_split = name.split("#");
+    // get id if provided, like "classname#id=testy"
+    let id_split = ("" + class_name).split("#");
     if (id_split.length > 1) {
-        attributes = id_split[1];
-        name = id_split[0];
+        attributes = id_split.slice(1).join("#");
+        class_name = id_split[0];
     }
-    console.log();
+
+    // don't add class="" to tag for empty classes
+    if (class_name && class_name !== "html") class_name = ` class="${class_name} "`;
+
     // if only part of the markup has been requested, provide start or end of the tag
     if (part) {
         if (part === "start") {
-            return start(tag) + name + '"' + attributes + ">";
+            return start(tag) + class_name + attributes + ">";
         } else {
             return end(tag);
         }
         // otherwise provide the whole tag
     } else {
-        if (name == "html") {
+        if (class_name == "html") {
             return child_name;
         } else {
             return (
                 start(tag) +
-                name +
-                '"' +
+                class_name +
                 attributes +
                 ">" +
                 (child_name ? bootstrap_markup(child_name) : "") +
