@@ -5,22 +5,26 @@ module.exports = `<script>
         // Only run this on localhost - to avoid it causing issues if left in by mistake when previewed on a real domain
 
         if (window.location.hostname == "localhost") {
-            let socket = new WebSocket("ws://localhost:8080");
+            window.cheerio_mockups_socket = new WebSocket("ws://localhost:8080");
 
-            socket.onopen = function (e) {
+            window.cheerio_mockups_socket.onopen = function (e) {
                 console.log("[open] Connection established");
             };
 
-            socket.onmessage = function (event) {
+            window.cheerio_mockups_socket.onmessage = function (event) {
                 console.log("[message] received from server: " + event.data);
-                location.reload(true);
+                if (event.data==="Refresh") {
+                    location.reload(true);
+                } else {
+                    window.cheerio_mockups_socket_stop = true;
+                }
             };
 
-            socket.onerror = function (error) {
+            window.cheerio_mockups_socket.onerror = function (error) {
                 console.log("[error] " + error.message);
             };
 
-            socket.onclose = function (event) {
+            window.cheerio_mockups_socket.onclose = function (event) {
                 if (event.wasClean) {
                     console.log("[close] Connection closed cleanly, code=" + event.code + " reason=" + event.reason);
                 } else {
@@ -30,6 +34,11 @@ module.exports = `<script>
                 }
                 websocket_listener();
             };
+            setTimeout(()=>{
+                console.log("send?");
+                //window.cheerio_mockups_socket.send("message");
+            }, 2000);
+            
         }
     }
 </script>`;

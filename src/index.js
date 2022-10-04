@@ -50,6 +50,12 @@ module.exports = function (config_filepath = "mockups_config.js") {
         let output_watcher;
         wss.on("connection", (ws) => {
             console.log("ws_server: connection from browser");
+            ws.on("message", (data) => {
+                console.log("############### received: %s", data);
+                setTimeout(() => {
+                    ws.send("screenshots_finished");
+                }, 2000);
+            });
             let refreshed = false;
             if (output_watcher) output_watcher.close();
             output_watcher = chokidar.watch(output_path, options.chokidar.input);
@@ -57,7 +63,7 @@ module.exports = function (config_filepath = "mockups_config.js") {
             output_watcher.on("change", (event, _path) => {
                 setTimeout(() => {
                     console.log("ws_server: html has been updated: " + event);
-                    if (!refreshed) ws.send("html has been updated - please refresh!");
+                    if (!refreshed) ws.send("Refresh");
                     refreshed = true;
                 }, 500); //wait to allow pages to be regenerated
             });

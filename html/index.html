@@ -44,16 +44,19 @@
             }
         </style>
         <script>
+            let current_mockup = "";
+            let screenshots_button_animation;
             window.onload = init_width_buttons;
             function init_width_buttons() {
                 let all_buttons = [...document.getElementsByTagName("button")];
                 let all_size_buttons = [...document.querySelectorAll(`button[data-size]`)];
                 let all_mockup_buttons = [...document.querySelectorAll(`button[data-mockup]`)];
-                console.log(all_size_buttons, all_mockup_buttons);
+                current_mockup = all_mockup_buttons[0].textContent;
+                //console.log(all_size_buttons, all_mockup_buttons);
                 let all_iframes = [...document.getElementsByTagName("iframe")];
-                all_buttons.forEach((b) => b.addEventListener("click", apply_width_to_iframes));
+                all_buttons.forEach((b) => b.addEventListener("click", click_handler));
 
-                function apply_width_to_iframes(e) {
+                function click_handler(e) {
                     let size = e.target.getAttribute("data-size");
                     let mockup_id = e.target.getAttribute("data-mockup");
                     if (size) {
@@ -70,18 +73,43 @@
                         all_mockup_buttons.map((b) => (b.className = ""));
                         this_button.className = "active";
 
+                        current_mockup = all_mockup_buttons[mockup_id].textContent;
+
                         //show iframe, hide others
                         let this_iframe = document.querySelector(`iframe[data-mockup='${mockup_id}']`);
                         all_iframes.map((i) => (i.className = "hide"));
                         this_iframe.className = "";
+                    } else {
+                        window.cheerio_mockups_socket.send("message: " + current_mockup);
+                        all_buttons[0].setAttribute("disabled", "disabled");
+                        window.cheerio_mockups_socket_stop = false;
+                        screenshots_button_animation = setInterval(() => {
+                            //first button is save screenshots button
+                            if (window.cheerio_mockups_socket_stop === true) {
+                                cancel_animation();
+                            }
+                            if (all_buttons[0].textContent.length > 19) {
+                                all_buttons[0].textContent = "Save screenshots";
+                            } else {
+                                all_buttons[0].textContent = all_buttons[0].textContent + ".";
+                            }
+                        }, 400);
                     }
+                }
+                function cancel_animation() {
+                    clearInterval(screenshots_button_animation);
+                    setTimeout(() => {
+                        all_buttons[0].textContent = "Save screenshots";
+                        all_buttons[0].removeAttribute("disabled");
+                    }, 400);
                 }
             }
         </script>
     </head>
     <body>
         <div id="nav">
-            Width: <button data-size="375px">mobile</button> <button data-size="810px">tablet(port)</button>
+            <button>Save screenshots</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Width:
+            <button data-size="375px">mobile</button> <button data-size="810px">tablet(port)</button>
             <button data-size="1080px">tablet(land)</button>
             <button class="active" data-size="calc(100% - 10px)">desktop</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mockups:&nbsp;
         <button class="active" data-mockup="0">test</button> <button class="" data-mockup="1">test-really-long-name-that-seems-frankly-too-long</button> </div>
@@ -95,22 +123,26 @@
         // Only run this on localhost - to avoid it causing issues if left in by mistake when previewed on a real domain
 
         if (window.location.hostname == "localhost") {
-            let socket = new WebSocket("ws://localhost:8080");
+            window.cheerio_mockups_socket = new WebSocket("ws://localhost:8080");
 
-            socket.onopen = function (e) {
+            window.cheerio_mockups_socket.onopen = function (e) {
                 console.log("[open] Connection established");
             };
 
-            socket.onmessage = function (event) {
+            window.cheerio_mockups_socket.onmessage = function (event) {
                 console.log("[message] received from server: " + event.data);
-                location.reload(true);
+                if (event.data==="Refresh") {
+                    location.reload(true);
+                } else {
+                    window.cheerio_mockups_socket_stop = true;
+                }
             };
 
-            socket.onerror = function (error) {
+            window.cheerio_mockups_socket.onerror = function (error) {
                 console.log("[error] " + error.message);
             };
 
-            socket.onclose = function (event) {
+            window.cheerio_mockups_socket.onclose = function (event) {
                 if (event.wasClean) {
                     console.log("[close] Connection closed cleanly, code=" + event.code + " reason=" + event.reason);
                 } else {
@@ -120,6 +152,11 @@
                 }
                 websocket_listener();
             };
+            setTimeout(()=>{
+                console.log("send?");
+                //window.cheerio_mockups_socket.send("message");
+            }, 2000);
+            
         }
     }
 </script></body></html>
