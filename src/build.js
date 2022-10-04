@@ -49,13 +49,9 @@ mockups.forEach((mockup, m) => {
     fs.writeFileSync(path.join(options.output, `${filename}.html`), output_html);
 
     // insert link to this mockup into the index
-    $index("#nav").append(`<a href="#${mockup.name}">${mockup.name}</a> | `);
-    $index("#main").append(
-        `<a name="${mockup.name}" href="${filename}">${mockup.name}</a><iframe style="width:calc(100% - 10px); height:calc(100vh - 150px);" src="${filename}"></iframe>`
-    );
+    $index("#nav").append(`<button class="${m ? "" : "active"}" data-mockup="${m}">${mockup.name}</button> `);
+    $index("#main").append(`<iframe class="${m ? "hide" : ""}" data-mockup="${m}" src="${filename}"></iframe>`);
 });
-
-$index("#main").append("<p>&nbsp;</p>");
 
 // Save index as html file
 let output_html = $index.html();

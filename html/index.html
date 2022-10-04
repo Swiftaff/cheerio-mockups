@@ -4,6 +4,10 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Mockups</title>
         <style>
+            body {
+                padding: 0 5px;
+                margin: 0;
+            }
             #nav {
                 position: absolute;
                 width: calc(100vw - 30px);
@@ -15,18 +19,73 @@
             #main {
                 position: absolute;
                 top: 50px;
-                height: calc(100vh - 100px);
-                width: calc(100vw - 50px);
+                height: calc(100vh - 50px);
+                width: calc(100vw - 5px);
                 overflow: auto;
             }
             iframe {
                 border: 1px solid grey;
+                width: calc(100% - 10px);
+                height: calc(100vh - 60px);
+            }
+            button {
+                background-color: #eee;
+                border: #999 1px solid;
+                border-radius: 5px;
+                padding: 2px 5px;
+            }
+            .active {
+                background-color: white;
+                border: 1px black solid;
+            }
+            .hide {
+                visibility: hidden;
+                display: none;
             }
         </style>
+        <script>
+            window.onload = init_width_buttons;
+            function init_width_buttons() {
+                let all_buttons = [...document.getElementsByTagName("button")];
+                let all_size_buttons = [...document.querySelectorAll(`button[data-size]`)];
+                let all_mockup_buttons = [...document.querySelectorAll(`button[data-mockup]`)];
+                console.log(all_size_buttons, all_mockup_buttons);
+                let all_iframes = [...document.getElementsByTagName("iframe")];
+                all_buttons.forEach((b) => b.addEventListener("click", apply_width_to_iframes));
+
+                function apply_width_to_iframes(e) {
+                    let size = e.target.getAttribute("data-size");
+                    let mockup_id = e.target.getAttribute("data-mockup");
+                    if (size) {
+                        //highlight size button, unhighlight others
+                        let this_button = document.querySelector(`button[data-size='${size}']`);
+                        all_size_buttons.map((b) => (b.className = ""));
+                        this_button.className = "active";
+
+                        //resize all iframes
+                        all_iframes.map((i) => (i.style.width = `${size}`));
+                    } else if (mockup_id) {
+                        //highlight mockup button, unhighlight others
+                        let this_button = document.querySelector(`button[data-mockup='${mockup_id}']`);
+                        all_mockup_buttons.map((b) => (b.className = ""));
+                        this_button.className = "active";
+
+                        //show iframe, hide others
+                        let this_iframe = document.querySelector(`iframe[data-mockup='${mockup_id}']`);
+                        all_iframes.map((i) => (i.className = "hide"));
+                        this_iframe.className = "";
+                    }
+                }
+            }
+        </script>
     </head>
     <body>
-        <div id="nav"><a href="#yaml_test">yaml_test</a> | </div>
-        <div id="main"><a name="yaml_test" href="yaml_test">yaml_test</a><iframe style="width:calc(100% - 10px); height:calc(100vh - 150px);" src="yaml_test"></iframe><p>&nbsp;</p></div>
+        <div id="nav">
+            Width: <button data-size="375px">mobile</button> <button data-size="810px">tablet(port)</button>
+            <button data-size="1080px">tablet(land)</button>
+            <button class="active" data-size="calc(100% - 10px)">desktop</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mockups:&nbsp;
+        <button class="active" data-mockup="0">test</button> <button class="" data-mockup="1">test-really-long-name-that-seems-frankly-too-long</button> </div>
+        <div id="main"><iframe class="" data-mockup="0" src="test"></iframe><iframe class="hide" data-mockup="1" src="test-really-long-name-that-seems-frankly-too-long"></iframe></div>
     
 
 <script>

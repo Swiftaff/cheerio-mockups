@@ -1,0 +1,44 @@
+<!DOCTYPE html><html class="js-enabled" lang="en"><head>
+        <meta charset="utf-8">
+
+        <title>Test</title>
+    </head>
+    <body>
+        <h1>Hello there again!</h1>
+    
+
+<script>
+    websocket_listener();
+
+    function websocket_listener() {
+        // Only run this on localhost - to avoid it causing issues if left in by mistake when previewed on a real domain
+
+        if (window.location.hostname == "localhost") {
+            let socket = new WebSocket("ws://localhost:8080");
+
+            socket.onopen = function (e) {
+                console.log("[open] Connection established");
+            };
+
+            socket.onmessage = function (event) {
+                console.log("[message] received from server: " + event.data);
+                location.reload(true);
+            };
+
+            socket.onerror = function (error) {
+                console.log("[error] " + error.message);
+            };
+
+            socket.onclose = function (event) {
+                if (event.wasClean) {
+                    console.log("[close] Connection closed cleanly, code=" + event.code + " reason=" + event.reason);
+                } else {
+                    // e.g. server process killed or network down
+                    // event.code is usually 1006 in this case
+                    console.log("[close] Connection died - attempting to reload ws connection...");
+                }
+                websocket_listener();
+            };
+        }
+    }
+</script><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p><p>Long page</p></body></html>
