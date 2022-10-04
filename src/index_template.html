@@ -5,6 +5,29 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>Mockups</title>
+        <style>
+            #nav {
+                position: absolute;
+                width: calc(100vw - 30px);
+                height: 30px;
+                padding: 10px;
+                top: 0;
+                background-color: #eee;
+            }
+            #main {
+                position: absolute;
+                top: 50px;
+                height: calc(100vh - 100px);
+                width: calc(100vw - 50px);
+                overflow: auto;
+            }
+            iframe {
+                border: 1px solid grey;
+            }
+        </style>
     </head>
-    <body></body>
+    <body>
+        <div id="nav"></div>
+        <div id="main"></div>
+    </body>
 </html>

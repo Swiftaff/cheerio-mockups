@@ -19,7 +19,14 @@ if (!Array.isArray(mockups)) {
     mockups = [mockups];
 }
 
-let filenames = [];
+// get index_template
+const index_file_data = fs.readFileSync(path.join(__dirname, "/index_template.html"), {
+    encoding: "utf8",
+    flag: "r",
+});
+let $index = cheerio.load(index_file_data);
+// inject hot reloader
+$index("body").append($index.html(browser_hot_reloader));
 
 mockups.forEach((mockup, m) => {
     // get original HTML
@@ -39,9 +46,20 @@ mockups.forEach((mockup, m) => {
     let output_html = $.html();
     //console.log(output_html);
     let filename = mockup.name || "index" + m;
-    filenames.push(filename);
     fs.writeFileSync(path.join(options.output, `${filename}.html`), output_html);
+
+    // insert link to this mockup into the index
+    $index("#nav").append(`<a href="#${mockup.name}">${mockup.name}</a> | `);
+    $index("#main").append(
+        `<a name="${mockup.name}" href="${filename}">${mockup.name}</a><iframe style="width:calc(100% - 10px); height:calc(100vh - 150px);" src="${filename}"></iframe>`
+    );
 });
+
+$index("#main").append("<p>&nbsp;</p>");
+
+// Save index as html file
+let output_html = $index.html();
+fs.writeFileSync(path.join(options.output, `index.html`), output_html);
 
 function get_template_as_html(template_filename) {
     const file_data = fs.readFileSync(path.join(options.input, template_filename), {
