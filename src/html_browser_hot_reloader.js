@@ -1,9 +1,6 @@
 module.exports = `<script>
-    
-    window.onload = ()=>{
-        ui();
-        websocket_listener();
-    };
+    websocket_listener();
+    ui();
 
     function ui(){
         if (window.location.href !=="http://localhost:3000/") {
