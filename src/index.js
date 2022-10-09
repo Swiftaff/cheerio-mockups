@@ -20,7 +20,7 @@ module.exports = function () {
     let server;
     let config_path = path.join(path.dirname(process.argv[1]), "mockups_config.js");
     let options = get_options();
-    let input_path = config_path;
+    let input_path = path.dirname(process.argv[1]);
     let output_path = path.join(process.cwd(), options.output);
     let src_path = path.join(process.cwd(), "/src");
     watch();
