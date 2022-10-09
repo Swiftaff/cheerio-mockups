@@ -2486,23 +2486,30 @@
             let y = 10;
             let w = 200;
             let h = 20;
-            const {outline, labelText} = createLabel();
-            changeStyle();
+            let mx = 0;
+            let my = 0;
+            const {outline, label, labelText} = createLabel();
+            changeOutlineStyle();
+            changeLabelStyle();
             window.onkeydown = (e) => keyDown(e);
             window.onmousemove = (e)=> move(e);
         
             function createLabel(){
                 const outline = document.createElement("DIV");
+                const label = document.createElement("DIV");
                 const labelText = document.createTextNode("body");
-                outline.appendChild(labelText);
+                label.appendChild(labelText);
                 document.body.prepend(outline);
-                return {outline, labelText};
+                document.body.prepend(label);
+                return {outline, label, labelText};
             }
         
             function move(e){
-                const {clientX:x, clientY:y} = e;
-                const els = document.elementsFromPoint(x,y);
-                if (moving && currentElement !== els[0]) changeCurrentElement(els[0]);
+                mx = e.clientX;
+                my = e.clientY;
+                const els = document.elementsFromPoint(mx,my);
+                changeLabelStyle();
+                if (moving && currentElement !== els[0]) changeCurrentElement(els[0]); // gets first element only
             }
 
             function changeCurrentElement(el){
@@ -2519,13 +2526,21 @@
 
                 currentElement = el;
                 labelText.textContent = text;
-                changeStyle();
+                changeOutlineStyle();
             }
 
-            function changeStyle(){
-                const color = moving?"blue":"red";
-                const stroke = moving?"1":"2";
+            function changeOutlineStyle(){
+                const color = moving ? "blue" : "red";
+                const stroke = moving ? 1 : 2;
                 outline.style = "position: absolute; top: "+y+"px; left: "+x+"px; width: "+w+"px; height: "+h+"px; border: "+stroke+"px dashed "+color+"; z-index: 1000000000; pointer-events: none;"
+            }
+
+            function changeLabelStyle(){
+                const color = moving ? "grey" : "red";
+                const stroke = moving ? 1 : 2;
+                const xx = moving ? mx+20: x;
+                const yy = moving ? my+20: y + h + stroke;
+                label.style = "position: absolute; top: "+yy+"px; left: "+xx+"px; height: 20px; background-color: "+color+"; z-index: 1000000000; border-radius: 5px; color: white; padding: 1px 5px;"
             }
 
             function keyDown(e) {
@@ -2536,7 +2551,8 @@
 
             function toggleMoving(){
                 moving = !moving;
-                changeStyle();
+                changeOutlineStyle();
+                changeLabelStyle();
             }
         }
     }
