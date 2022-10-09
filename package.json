@@ -7,6 +7,7 @@
     "yaml_example": "node example_yaml/index.js",
     "yaml_test_parse": "node example_yaml/yaml_test_parse.js",
     "example": "node example/index.js",
+    "example_inbrowser": "node example_inbrowser/index.js",
     "auto_dev": "node src/index",
     "manually_start_html_server": "sirv html --port 3000",
     "manually_build_html_files": "node src/build"

@@ -16,11 +16,11 @@ const chokidar = require("chokidar");
 const WebSocket = require("ws");
 const { spawn, exec } = require("child_process");
 
-module.exports = function (config_filepath = "mockups_config.js") {
+module.exports = function () {
     let server;
-    let config_path = path.join(process.cwd(), config_filepath);
+    let config_path = path.join(path.dirname(process.argv[1]), "mockups_config.js");
     let options = get_options();
-    let input_path = path.join(process.cwd(), options.input);
+    let input_path = config_path;
     let output_path = path.join(process.cwd(), options.output);
     let src_path = path.join(process.cwd(), "/src");
     watch();
@@ -132,7 +132,6 @@ module.exports = function (config_filepath = "mockups_config.js") {
         const config = require(config_path);
         return {
             mockups: [],
-            input: "",
             output: "html",
             original: "original.html",
             port: 3000,
