@@ -3,6 +3,13 @@ module.exports = {
     output: "html",
     mockups: [
         {
+            name: "test2",
+            instructions: function ($, $$) {
+                $("h1").text("Hello there!");
+                return $;
+            },
+        },
+        /*{
             name: "test",
             instructions: function ($, $$) {
                 $("h1").text("Hello there!");
@@ -58,6 +65,6 @@ module.exports = {
 
                 return $;
             },
-        },
+        },*/
     ],
 };
