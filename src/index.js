@@ -68,8 +68,35 @@ module.exports = function () {
                         const output_code = `module.exports = ${JSON.stringify(data)};`;
                         fs.writeFileSync(config_path, output_code);
                     } else if (obj.action === "remove") {
-                        //REMOVE ELEMENT
-                        console.log("remove", obj);
+                        //ADD 'REMOVE ELEMENT' to list of instructions
+                        //get page_name
+                        let split = obj.url.split("/");
+                        let page_name = split[split.length - 1];
+                        console.log("remove", obj, page_name);
+                        //get current data
+                        const config_data = fs.readFileSync(config_path, {
+                            encoding: "utf8",
+                            flag: "r",
+                        });
+                        const config_data_only = toJSONString(config_data.slice(17, config_data.length - 2));
+                        const config_obj = JSON.parse(config_data_only);
+                        //insert instruction
+                        config_obj.mockups.map((m) => {
+                            if (m.name === page_name) {
+                                if (!m.instructions) m.instructions = [];
+                                //create new instruction
+                                let instruction = {
+                                    action: "remove",
+                                    selector: obj.selector,
+                                };
+                                if (obj.index) instruction.index = obj.index;
+                                m.instructions.push(instruction);
+                            }
+                            return m;
+                        });
+                        //save file again
+                        const output_code = `module.exports = ${JSON.stringify(config_obj)};\n`;
+                        fs.writeFileSync(config_path, output_code);
                     } else {
                         //SCREENSHOT
                         console.log("screenshot", obj.name);
@@ -100,6 +127,14 @@ module.exports = function () {
                 }
             }, 500); //wait to allow pages to be regenerated
         });
+    }
+
+    function toJSONString(input) {
+        const keyMatcher = '([^",{}\\s]+?)';
+        const valMatcher = "(.,*)";
+        const matcher = new RegExp(`${keyMatcher}\\s*:\\s*${valMatcher}`, "g");
+        const parser = (match, key, value) => `"${key}":${value}`;
+        return input.replace(matcher, parser);
     }
 
     function serve() {
