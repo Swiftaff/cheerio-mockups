@@ -23,6 +23,7 @@ module.exports = function () {
     let input_path = path.dirname(process.argv[1]);
     let output_path = path.join(process.cwd(), options.output);
     let src_path = path.join(process.cwd(), "/src");
+    let first_watched_file_was_updated = false;
     watch();
     build();
     serve();
@@ -48,18 +49,14 @@ module.exports = function () {
         console.log("ws_server: started");
 
         let output_watcher;
-        wss.on("connection", (ws) => {
-            console.log("ws_server: connection from browser");
+        wss.on("connection", (ws, request) => {
+            console.log("ws_server: connection from browser"); //, Object.keys(request), request.headers);
             ws.on("message", (data) => {
                 const str = new TextDecoder().decode(data);
                 let obj = JSON.parse(str);
                 if (obj && obj.action) {
                     if (obj.action === "new") {
                         console.log("new", obj.name, config_path);
-                        const config_file_data = fs.readFileSync(path.join(config_path), {
-                            encoding: "utf8",
-                            flag: "r",
-                        });
                         const data = require(config_path);
                         console.log(data);
                         data.mockups.push({
@@ -77,21 +74,26 @@ module.exports = function () {
                     }
                 }
             });
-            //let refreshed = false;
-            if (output_watcher) output_watcher.close();
-            output_watcher = chokidar.watch(output_path, options.chokidar.input);
-            console.log("output_path", output_path);
-            output_watcher.on("change", (event, _path) => {
-                setTimeout(() => {
-                    console.log("ws_server: html has been updated: " + event);
-                    ws.send("Refresh");
-                    //if (!refreshed) ws.send("Refresh");
-                    //refreshed = true;
-                    //setTimeout(() => {
-                    //    refreshed = false;
-                    //}, 500);
-                }, 1000); //wait to allow pages to be regenerated
-            });
+        });
+        if (output_watcher) output_watcher.close();
+        output_watcher = chokidar.watch(output_path, options.chokidar.input);
+        output_watcher.on("change", (event, _path) => {
+            setTimeout(() => {
+                console.log("ws_server: html has been updated: " + event);
+                // only send a refresh message for the first changed file, to avoid multiple refreshes
+                if (!first_watched_file_was_updated) {
+                    first_watched_file_was_updated = true;
+                    wss.clients.forEach(function each(client) {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send("Refresh");
+                        }
+                    });
+                    setTimeout(() => {
+                        first_watched_file_was_updated = false;
+                        console.log("ws_server: reset first_watched_file_was_updated");
+                    }, 2000);
+                }
+            }, 500); //wait to allow pages to be regenerated
         });
     }
 

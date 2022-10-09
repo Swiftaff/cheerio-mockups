@@ -1,10 +1,15 @@
 module.exports = `<script>
-    websocket_listener();
-    ui();
+    if (window.location.hostname === "localhost") {
+        // Only run these on localhost - to avoid it causing issues
+        // if left in by mistake when previewed on a real domain
+        websocket_listener();
+        ui();
+    }
 
     function ui(){
         if (window.location.href !=="http://localhost:3000/") {
-            console.log("loaded", window.location.href);
+        // only run on pages being iframed, not on the main index page
+            console.log("ui loaded", window.location.href);
             let currentElement = document.body;
             let moving = true;
             let x = 10;
@@ -83,43 +88,32 @@ module.exports = `<script>
     }
 
     function websocket_listener() {
-        // Only run this on localhost - to avoid it causing issues if left in by mistake when previewed on a real domain
+        window.cheerio_mockups_socket = new WebSocket("ws://localhost:8080");//, [], {"testy": "testy.html"});
 
-        if (window.location.hostname == "localhost") {
-            window.cheerio_mockups_socket = new WebSocket("ws://localhost:8080");
+        window.cheerio_mockups_socket.onopen = function (e) {
+            console.log("[open] Connection established to ", window.location.href);
+        };
 
-            window.cheerio_mockups_socket.onopen = function (e) {
-                console.log("[open] Connection established");
-            };
+        window.cheerio_mockups_socket.onmessage = function (event) {
+            console.log("[message] received from server: " + event.data);
+            if (event.data==="Refresh") {
+                location.reload(true);
+            }
+        };
 
-            window.cheerio_mockups_socket.onmessage = function (event) {
-                console.log("[message] received from server: " + event.data);
-                if (event.data==="Refresh") {
-                    location.reload(true);
-                } else {
-                    window.cheerio_mockups_socket_stop = true;
-                }
-            };
+        window.cheerio_mockups_socket.onerror = function (error) {
+            console.log("[error] " + error.message);
+        };
 
-            window.cheerio_mockups_socket.onerror = function (error) {
-                console.log("[error] " + error.message);
-            };
-
-            window.cheerio_mockups_socket.onclose = function (event) {
-                if (event.wasClean) {
-                    console.log("[close] Connection closed cleanly, code=" + event.code + " reason=" + event.reason);
-                } else {
-                    // e.g. server process killed or network down
-                    // event.code is usually 1006 in this case
-                    console.log("[close] Connection died - attempting to reload ws connection...");
-                }
-                websocket_listener();
-            };
-            setTimeout(()=>{
-                console.log("send?");
-                //window.cheerio_mockups_socket.send("message");
-            }, 2000);
-            
-        }
+        window.cheerio_mockups_socket.onclose = function (event) {
+            if (event.wasClean) {
+                console.log("[close] Connection closed cleanly, code=" + event.code + " reason=" + event.reason);
+            } else {
+                // e.g. server process killed or network down
+                // event.code is usually 1006 in this case
+                console.log("[close] Connection died - attempting to reload ws connection...");
+            }
+            websocket_listener();
+        };
     }
 </script>`;
