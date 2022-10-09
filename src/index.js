@@ -56,6 +56,7 @@ module.exports = function () {
                 let obj = JSON.parse(str);
                 if (obj && obj.action) {
                     if (obj.action === "new") {
+                        //NEW PAGE
                         console.log("new", obj.name, config_path);
                         const data = require(config_path);
                         console.log(data);
@@ -66,7 +67,11 @@ module.exports = function () {
                         console.log(data);
                         const output_code = `module.exports = ${JSON.stringify(data)};`;
                         fs.writeFileSync(config_path, output_code);
+                    } else if (obj.action === "remove") {
+                        //REMOVE ELEMENT
+                        console.log("remove", obj);
                     } else {
+                        //SCREENSHOT
                         console.log("screenshot", obj.name);
                         setTimeout(() => {
                             ws.send("screenshots_finished");

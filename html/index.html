@@ -122,8 +122,8 @@
             <button data-size="375px">mobile</button> <button data-size="810px">tablet(port)</button>
             <button data-size="1080px">tablet(land)</button>
             <button class="active" data-size="calc(100% - 10px)">desktop</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mockups:&nbsp;<input><button data-type="new">+ new</button>
-        <button class="active" data-mockup="0">asd</button> </div>
-        <div id="main"><iframe class="" data-mockup="0" src="asd"></iframe></div>
+        <button class="active" data-mockup="0">asd</button> <button class="" data-mockup="1">asd1</button> </div>
+        <div id="main"><iframe class="" data-mockup="0" src="asd"></iframe><iframe class="hide" data-mockup="1" src="asd1"></iframe></div>
     
 
 <script>
@@ -146,20 +146,26 @@
             let h = 20;
             let mx = 0;
             let my = 0;
-            const {outline, label, labelText} = createLabel();
+            const {outline, label, labelText, removeButton} = createLabel();
             changeOutlineStyle();
             changeLabelStyle();
+            changeButtonStyles();
             window.onkeydown = (e) => keyDown(e);
             window.onmousemove = (e)=> move(e);
         
             function createLabel(){
                 const outline = document.createElement("DIV");
                 const label = document.createElement("DIV");
-                const labelText = document.createTextNode("body");
-                label.appendChild(labelText);
+                const labelText = document.createElement("DIV");
+                labelText.textContent = "body";
+                const removeButton = document.createElement("BUTTON");
+                removeButton.textContent = "remove";
+                removeButton.addEventListener("click", do_remove);
+                label.append(labelText);
+                label.append(removeButton);
                 document.body.prepend(outline);
                 document.body.prepend(label);
-                return {outline, label, labelText};
+                return {outline, label, labelText, removeButton};
             }
         
             function move(e){
@@ -198,7 +204,13 @@
                 const stroke = moving ? 1 : 2;
                 const xx = moving ? mx+20: x;
                 const yy = moving ? my+20: y + h + stroke;
-                label.style = "position: absolute; top: "+yy+"px; left: "+xx+"px; height: 20px; background-color: "+color+"; z-index: 1000000000; border-radius: 5px; color: white; padding: 1px 5px;"
+                const hh = moving ? "20px": "auto";
+                label.style = "position: absolute; top: "+yy+"px; left: "+xx+"px; height: "+hh+"; background-color: "+color+"; z-index: 1000000000; border-radius: 5px; color: white; padding: 1px 5px;"
+            }
+
+            function changeButtonStyles(){
+                const display = moving ? "visibility: hidden;" : "visibility: visible;";
+                removeButton.style = "background-color: white; color: black; border: none; border-radius: 5px; padding: 0 5px; margin: 5px 0;"+display;
             }
 
             function keyDown(e) {
@@ -211,6 +223,44 @@
                 moving = !moving;
                 changeOutlineStyle();
                 changeLabelStyle();
+                changeButtonStyles();
+            }
+
+            function do_remove(){
+                const selector = get_unique_selector(currentElement);
+                console.log("do_remove", currentElement, selector);
+                window.cheerio_mockups_socket.send(JSON.stringify({action:"remove", ...selector, url: window.location.href}));
+            }
+
+            function get_unique_selector(el){
+                const name = el.tagName;
+                const id = el.id;
+                const classname = el.className;
+                const selector = el.tagName + (id?"#"+id:"") + (classname?"."+classname:"");
+                let possible_duplicates = document.querySelectorAll(selector);
+                let one_match = possible_duplicates.length === 1;
+                let no_matches = possible_duplicates.length === 0;
+                console.log("selector",selector, possible_duplicates, one_match, no_matches);
+                if (one_match){
+                    return {selector};
+                } else if (no_matches) {
+                    console.log("Oops - can't find ANYTHING with this reference:", selector);
+                } else {
+                    // multiple matches, so find the index for the matching element
+                    let index = -1;
+                    possible_duplicates.forEach((possible_el, i) => {
+                        console.log(el, possible_el, el.isEqualNode(possible_el));
+                        if (el.isEqualNode(possible_el)) {
+                            index = i;
+                        }
+                    });
+                    if (index === -1){
+                        console.log("Oops - can't find ANYTHING that specifically matches with this reference:", selector);
+                    } else {
+                        //return the selector, plus the optional index reference
+                        return {selector, index};
+                    }
+                }
             }
         }
     }
