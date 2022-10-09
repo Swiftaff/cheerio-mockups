@@ -51,10 +51,18 @@ module.exports = function () {
         wss.on("connection", (ws) => {
             console.log("ws_server: connection from browser");
             ws.on("message", (data) => {
-                console.log("############### received: %s", data);
-                setTimeout(() => {
-                    ws.send("screenshots_finished");
-                }, 2000);
+                const str = new TextDecoder().decode(data);
+                let obj = JSON.parse(str);
+                if (obj && obj.action) {
+                    if (obj.action === "new") {
+                        console.log("new", obj.name);
+                    } else {
+                        console.log("screenshot", obj.name);
+                        setTimeout(() => {
+                            ws.send("screenshots_finished");
+                        }, 2000);
+                    }
+                }
             });
             let refreshed = false;
             if (output_watcher) output_watcher.close();

@@ -50,8 +50,8 @@
             function init_width_buttons() {
                 let all_buttons = [...document.getElementsByTagName("button")];
                 let all_size_buttons = [...document.querySelectorAll(`button[data-size]`)];
-                let all_mockup_buttons = [...document.querySelectorAll(`button[data-mockup]`)];
-                current_mockup = all_mockup_buttons[0].textContent;
+                let all_mockup_buttons = [...document.querySelectorAll(`button[data-mockup]`)] || [];
+                current_mockup = all_mockup_buttons[0] ? all_mockup_buttons[0].textContent : "";
                 //console.log(all_size_buttons, all_mockup_buttons);
                 let all_iframes = [...document.getElementsByTagName("iframe")];
                 all_buttons.forEach((b) => b.addEventListener("click", click_handler));
@@ -59,6 +59,7 @@
                 function click_handler(e) {
                     let size = e.target.getAttribute("data-size");
                     let mockup_id = e.target.getAttribute("data-mockup");
+                    let button_type = e.target.getAttribute("data-type");
                     if (size) {
                         //highlight size button, unhighlight others
                         let this_button = document.querySelector(`button[data-size='${size}']`);
@@ -79,8 +80,14 @@
                         let this_iframe = document.querySelector(`iframe[data-mockup='${mockup_id}']`);
                         all_iframes.map((i) => (i.className = "hide"));
                         this_iframe.className = "";
+                    } else if (button_type) {
+                        console.log("new");
+                        let name = [...document.getElementsByTagName("INPUT")][0].value;
+                        console.log(name);
+                        window.cheerio_mockups_socket.send(JSON.stringify({action:"new", name}));
+                        //window.cheerio_mockups_socket.send("new");
                     } else {
-                        window.cheerio_mockups_socket.send("message: " + current_mockup);
+                        window.cheerio_mockups_socket.send(JSON.stringify({action:"screenshot", name:current_mockup}));
                         all_buttons[0].setAttribute("disabled", "disabled");
                         window.cheerio_mockups_socket_stop = false;
                         screenshots_button_animation = setInterval(() => {
@@ -111,9 +118,9 @@
             <button>Save screenshots</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Width:
             <button data-size="375px">mobile</button> <button data-size="810px">tablet(port)</button>
             <button data-size="1080px">tablet(land)</button>
-            <button class="active" data-size="calc(100% - 10px)">desktop</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mockups:&nbsp;
-        <button class="active" data-mockup="0">test2</button> </div>
-        <div id="main"><iframe class="" data-mockup="0" src="test2"></iframe></div>
+            <button class="active" data-size="calc(100% - 10px)">desktop</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mockups:&nbsp;<input><button data-type="new">+ new</button>
+        </div>
+        <div id="main"></div>
     
 
 <script>
