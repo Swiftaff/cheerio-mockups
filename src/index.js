@@ -55,7 +55,20 @@ module.exports = function () {
                 let obj = JSON.parse(str);
                 if (obj && obj.action) {
                     if (obj.action === "new") {
-                        console.log("new", obj.name);
+                        console.log("new", obj.name, config_path);
+                        const config_file_data = fs.readFileSync(path.join(config_path), {
+                            encoding: "utf8",
+                            flag: "r",
+                        });
+                        const data = require(config_path);
+                        console.log(data);
+                        data.mockups.push({
+                            name: obj.name,
+                            instructions: [],
+                        });
+                        console.log(data);
+                        const output_code = `module.exports = ${JSON.stringify(data)};`;
+                        fs.writeFileSync(config_path, output_code);
                     } else {
                         console.log("screenshot", obj.name);
                         setTimeout(() => {
@@ -64,16 +77,20 @@ module.exports = function () {
                     }
                 }
             });
-            let refreshed = false;
+            //let refreshed = false;
             if (output_watcher) output_watcher.close();
             output_watcher = chokidar.watch(output_path, options.chokidar.input);
             console.log("output_path", output_path);
             output_watcher.on("change", (event, _path) => {
                 setTimeout(() => {
                     console.log("ws_server: html has been updated: " + event);
-                    if (!refreshed) ws.send("Refresh");
-                    refreshed = true;
-                }, 500); //wait to allow pages to be regenerated
+                    ws.send("Refresh");
+                    //if (!refreshed) ws.send("Refresh");
+                    //refreshed = true;
+                    //setTimeout(() => {
+                    //    refreshed = false;
+                    //}, 500);
+                }, 1000); //wait to allow pages to be regenerated
             });
         });
     }

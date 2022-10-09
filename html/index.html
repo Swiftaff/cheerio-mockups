@@ -83,11 +83,14 @@
                     } else if (button_type) {
                         console.log("new");
                         let name = [...document.getElementsByTagName("INPUT")][0].value;
-                        console.log(name);
-                        window.cheerio_mockups_socket.send(JSON.stringify({action:"new", name}));
-                        //window.cheerio_mockups_socket.send("new");
+                        if (name && all_mockup_buttons.filter((b) => b.textContent === name).length === 0) {
+                            console.log(name);
+                            window.cheerio_mockups_socket.send(JSON.stringify({ action: "new", name }));
+                        }
                     } else {
-                        window.cheerio_mockups_socket.send(JSON.stringify({action:"screenshot", name:current_mockup}));
+                        window.cheerio_mockups_socket.send(
+                            JSON.stringify({ action: "screenshot", name: current_mockup })
+                        );
                         all_buttons[0].setAttribute("disabled", "disabled");
                         window.cheerio_mockups_socket_stop = false;
                         screenshots_button_animation = setInterval(() => {
@@ -119,8 +122,8 @@
             <button data-size="375px">mobile</button> <button data-size="810px">tablet(port)</button>
             <button data-size="1080px">tablet(land)</button>
             <button class="active" data-size="calc(100% - 10px)">desktop</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mockups:&nbsp;<input><button data-type="new">+ new</button>
-        </div>
-        <div id="main"></div>
+        <button class="active" data-mockup="0">asd</button> <button class="" data-mockup="1">a</button> <button class="" data-mockup="2">a</button> <button class="" data-mockup="3">b</button> <button class="" data-mockup="4">c</button> <button class="" data-mockup="5">d</button> </div>
+        <div id="main"><iframe class="" data-mockup="0" src="asd"></iframe><iframe class="hide" data-mockup="1" src="a"></iframe><iframe class="hide" data-mockup="2" src="a"></iframe><iframe class="hide" data-mockup="3" src="b"></iframe><iframe class="hide" data-mockup="4" src="c"></iframe><iframe class="hide" data-mockup="5" src="d"></iframe></div>
     
 
 <script>
@@ -128,7 +131,7 @@
     ui();
 
     function ui(){
-        if (window.location.href !=="http://localhost:3000/") {
+        //if (window.location.href !=="http://localhost:3000/") {
             console.log("loaded", window.location.href);
             let currentElement = document.body;
             let moving = true;
@@ -204,7 +207,7 @@
                 changeOutlineStyle();
                 changeLabelStyle();
             }
-        }
+        //}
     }
 
     function websocket_listener() {
@@ -239,12 +242,7 @@
                     console.log("[close] Connection died - attempting to reload ws connection...");
                 }
                 websocket_listener();
-            };
-            setTimeout(()=>{
-                console.log("send?");
-                //window.cheerio_mockups_socket.send("message");
-            }, 2000);
-            
+            };            
         }
     }
 </script></body></html>

@@ -40,7 +40,11 @@ mockups.forEach((mockup, m) => {
     $("body").append($.html(browser_hot_reloader));
 
     // Perform instructions for this mockup
-    $ = mockup.instructions($, get_template_as_html, get_template_as_yaml_bootstrap);
+    if (mockup.instructions) {
+        if (typeof mockup.instructions === "function") {
+            $ = mockup.instructions($, get_template_as_html, get_template_as_yaml_bootstrap);
+        }
+    }
 
     // Save mockup as html file
     let output_html = $.html();

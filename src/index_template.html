@@ -85,11 +85,14 @@
                     } else if (button_type) {
                         console.log("new");
                         let name = [...document.getElementsByTagName("INPUT")][0].value;
-                        console.log(name);
-                        window.cheerio_mockups_socket.send(JSON.stringify({action:"new", name}));
-                        //window.cheerio_mockups_socket.send("new");
+                        if (name && all_mockup_buttons.filter((b) => b.textContent === name).length === 0) {
+                            console.log(name);
+                            window.cheerio_mockups_socket.send(JSON.stringify({ action: "new", name }));
+                        }
                     } else {
-                        window.cheerio_mockups_socket.send(JSON.stringify({action:"screenshot", name:current_mockup}));
+                        window.cheerio_mockups_socket.send(
+                            JSON.stringify({ action: "screenshot", name: current_mockup })
+                        );
                         all_buttons[0].setAttribute("disabled", "disabled");
                         window.cheerio_mockups_socket_stop = false;
                         screenshots_button_animation = setInterval(() => {
@@ -121,7 +124,7 @@
             <button data-size="375px">mobile</button> <button data-size="810px">tablet(port)</button>
             <button data-size="1080px">tablet(land)</button>
             <button class="active" data-size="calc(100% - 10px)">desktop</button
-            >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mockups:&nbsp;<input></input><button data-type="new">+ new</button>
+            >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mockups:&nbsp;<input /><button data-type="new">+ new</button>
         </div>
         <div id="main"></div>
     </body>
