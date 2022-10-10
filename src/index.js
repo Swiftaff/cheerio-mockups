@@ -64,39 +64,44 @@ module.exports = function () {
                 let obj = JSON.parse(str);
                 if (obj && obj.action) {
                     const config = load_config_file(config_path);
-                    if (obj.action === "new") {
-                        //NEW PAGE
-                        config.mockups.push({
-                            name: obj.name,
-                            instructions: [],
-                        });
-                        save_config_file(config, config_path);
-                    } else if (obj.action === "remove") {
-                        //ADD 'REMOVE ELEMENT' to list of instructions
-                        //get page_name
-                        let split = obj.url.split("/");
-                        let page_name = split[split.length - 1];
-                        //insert instruction
-                        config.mockups.map((m) => {
-                            if (m.name === page_name) {
-                                if (!m.instructions) m.instructions = [];
-                                //create new instruction
-                                let instruction = {
-                                    action: "remove",
-                                    selector: obj.selector,
-                                };
-                                if (obj.index) instruction.index = obj.index;
-                                m.instructions.push(instruction);
-                            }
-                            return m;
-                        });
-                        save_config_file(config, config_path);
-                    } else {
-                        //SCREENSHOT
-                        console.log("screenshot", obj.name);
-                        setTimeout(() => {
-                            ws.send("screenshots_finished");
-                        }, 2000);
+                    switch (obj.action) {
+                        case "new":
+                            //NEW PAGE
+                            config.mockups.push({
+                                name: obj.name,
+                                instructions: [],
+                            });
+                            save_config_file(config, config_path);
+                            break;
+                        case "remove":
+                            //ADD 'REMOVE ELEMENT' to list of instructions
+                            //get page_name
+                            let split = obj.url.split("/");
+                            let page_name = split[split.length - 1];
+                            //insert instruction
+                            config.mockups.map((m) => {
+                                if (m.name === page_name) {
+                                    if (!m.instructions) m.instructions = [];
+                                    //create new instruction
+                                    let instruction = {
+                                        action: "remove",
+                                        selector: obj.selector,
+                                    };
+                                    if (obj.index) instruction.index = obj.index;
+                                    m.instructions.push(instruction);
+                                }
+                                return m;
+                            });
+                            save_config_file(config, config_path);
+                        case "requesting_config":
+                            ws.send(JSON.stringify({ action: "sending_config", config }));
+                        default:
+                            //SCREENSHOT
+                            console.log("screenshot", obj.name);
+                            setTimeout(() => {
+                                ws.send(JSON.stringify({ action: "screenshots_finished" }));
+                            }, 2000);
+                            break;
                     }
                 }
             });
@@ -111,7 +116,7 @@ module.exports = function () {
                     first_watched_file_was_updated = true;
                     wss.clients.forEach(function each(client) {
                         if (client.readyState === WebSocket.OPEN) {
-                            client.send("Refresh");
+                            client.send(JSON.stringify({ action: "refresh" }));
                         }
                     });
                     setTimeout(() => {

@@ -18,7 +18,7 @@ module.exports = `<script>
             let h = 20;
             let mx = 0;
             let my = 0;
-            const {outline, label, labelText, removeButton} = createLabel();
+            const {outline, label, labelText, removeButton, instructions} = createLabel();
             changeOutlineStyle();
             changeLabelStyle();
             changeButtonStyles();
@@ -26,6 +26,7 @@ module.exports = `<script>
             window.onmousemove = (e)=> move(e);
         
             function createLabel(){
+                const instructions = document.getElementById("instructions");
                 const outline = document.createElement("DIV");
                 const label = document.createElement("DIV");
                 const labelText = document.createElement("DIV");
@@ -37,7 +38,7 @@ module.exports = `<script>
                 label.append(removeButton);
                 document.body.prepend(outline);
                 document.body.prepend(label);
-                return {outline, label, labelText, removeButton};
+                return {outline, label, labelText, removeButton, instructions};
             }
         
             function move(e){
@@ -142,12 +143,41 @@ module.exports = `<script>
 
         window.cheerio_mockups_socket.onopen = function (e) {
             console.log("[open] Connection established to ", window.location.href);
+            if (window.location.href === "http://localhost:3000/"){
+                window.cheerio_mockups_socket.send(JSON.stringify({action:"requesting_config"}));
+            }
         };
 
         window.cheerio_mockups_socket.onmessage = function (event) {
             console.log("[message] received from server: " + event.data);
-            if (event.data==="Refresh") {
-                location.reload(true);
+            if (event.data) {
+                let request = JSON.parse(event.data);
+                if (request && request.action){
+                    switch (request.action) {
+                        case "sending_config":
+                            request.config;
+                            console.log("config",request.config);
+                            let html = "";
+                            request.config.mockups.forEach(mockup=>{
+                                html += "<p>" + mockup.name + "</p><ul>";
+                                mockup.instructions.forEach(instruction => {
+                                    html += "<li>" + instruction.action + ": " + instruction.selector;
+                                    if ("index" in instruction) html += "[" + instruction.index + "]";
+                                    html += "</li>";
+                                });
+                                html += "</ul>";
+                            });
+                            instructions.innerHTML = html;
+                            console.log(html);
+                            break;
+                        case "refresh":
+                            location.reload(true);
+                            break;
+                        default:
+                            console.log(request.action);
+                            break;
+                    }
+                }
             }
         };
 

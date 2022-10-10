@@ -25,9 +25,18 @@
                 width: calc(100vw - 5px);
                 overflow: auto;
             }
+            #instructions {
+                position: absolute;
+                top: 50px;
+                right: 5px;
+                height: calc(100vh - 60px);
+                width: 285px;
+                overflow: auto;
+                border: 1px solid grey;
+            }
             iframe {
                 border: 1px solid grey;
-                width: calc(100% - 10px);
+                width: calc(100% - 300px);
                 height: calc(100vh - 60px);
             }
             button {
@@ -123,9 +132,10 @@
             <button>Save screenshots</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Width:
             <button data-size="375px">mobile</button> <button data-size="810px">tablet(port)</button>
             <button data-size="1080px">tablet(land)</button>
-            <button class="active" data-size="calc(100% - 10px)">desktop</button
+            <button class="active" data-size="calc(100% - 300px)">desktop</button
             >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mockups:&nbsp;<input /><button data-type="new">+ new</button>
         </div>
         <div id="main"></div>
+        <div id="instructions"></div>
     </body>
 </html>
