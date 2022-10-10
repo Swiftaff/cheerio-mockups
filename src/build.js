@@ -43,6 +43,18 @@ mockups.forEach((mockup, m) => {
     if (mockup.instructions) {
         if (typeof mockup.instructions === "function") {
             $ = mockup.instructions($, get_template_as_html, get_template_as_yaml_bootstrap);
+        } else if (typeof mockup.instructions === "object" && Array.isArray(mockup.instructions)) {
+            mockup.instructions.forEach(({ action, selector, index }) => {
+                switch (action) {
+                    case "remove":
+                        $(selector)
+                            .eq(index || 0)
+                            .remove();
+                        break;
+                    default:
+                        break;
+                }
+            });
         }
     }
 
