@@ -1,0 +1,36 @@
+{
+  "output": "html",
+  "mockups": [
+    {
+      "name": "asd",
+      "instructions": [
+        {
+          "action": "remove",
+          "selector": "STRONG",
+          "index": 3
+        },
+        {
+          "action": "remove",
+          "selector": "STRONG",
+          "index": 1
+        },
+        {
+          "action": "remove",
+          "selector": "A#js-link-box-en.link-box"
+        },
+        {
+          "action": "remove",
+          "selector": "A#js-link-box-de.link-box"
+        },
+        {
+          "action": "remove",
+          "selector": "A#js-link-box-es.link-box"
+        }
+      ]
+    },
+    {
+      "name": "asd1",
+      "instructions": []
+    }
+  ]
+}

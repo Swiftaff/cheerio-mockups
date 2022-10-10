@@ -19,6 +19,14 @@ const { spawn, exec } = require("child_process");
 module.exports = function () {
     let server;
     let config_path = path.join(path.dirname(process.argv[1]), "mockups_config.js");
+    if (!fs.existsSync(config_path)) {
+        config_path = path.join(path.dirname(process.argv[1]), "mockups_config.json");
+        if (!fs.existsSync(config_path)) {
+            console.error(
+                "No config file found - need either a mockups_config.js (with module.exports) or mockups_config.json"
+            );
+        }
+    }
     let options = get_options();
     let input_path = path.dirname(process.argv[1]);
     let output_path = path.join(process.cwd(), options.output);
@@ -55,33 +63,21 @@ module.exports = function () {
                 const str = new TextDecoder().decode(data);
                 let obj = JSON.parse(str);
                 if (obj && obj.action) {
+                    const config = load_config_file(config_path);
                     if (obj.action === "new") {
                         //NEW PAGE
-                        console.log("new", obj.name, config_path);
-                        const data = require(config_path);
-                        console.log(data);
-                        data.mockups.push({
+                        config.mockups.push({
                             name: obj.name,
                             instructions: [],
                         });
-                        console.log(data);
-                        const output_code = `module.exports = ${JSON.stringify(data)};`;
-                        fs.writeFileSync(config_path, output_code);
+                        save_config_file(config, config_path);
                     } else if (obj.action === "remove") {
                         //ADD 'REMOVE ELEMENT' to list of instructions
                         //get page_name
                         let split = obj.url.split("/");
                         let page_name = split[split.length - 1];
-                        console.log("remove", obj, page_name);
-                        //get current data
-                        const config_data = fs.readFileSync(config_path, {
-                            encoding: "utf8",
-                            flag: "r",
-                        });
-                        const config_data_only = toJSONString(config_data.slice(17, config_data.length - 2));
-                        const config_obj = JSON.parse(config_data_only);
                         //insert instruction
-                        config_obj.mockups.map((m) => {
+                        config.mockups.map((m) => {
                             if (m.name === page_name) {
                                 if (!m.instructions) m.instructions = [];
                                 //create new instruction
@@ -94,9 +90,7 @@ module.exports = function () {
                             }
                             return m;
                         });
-                        //save file again
-                        const output_code = `module.exports = ${JSON.stringify(config_obj)};\n`;
-                        fs.writeFileSync(config_path, output_code);
+                        save_config_file(config, config_path);
                     } else {
                         //SCREENSHOT
                         console.log("screenshot", obj.name);
@@ -130,11 +124,15 @@ module.exports = function () {
     }
 
     function toJSONString(input) {
+        let input_without_module_exports = input.slice(17, input.length);
+        let split = input_without_module_exports.split(";");
+        let input_without_last_semicolon = split.slice(0, split.length - 1).join(";");
+
         const keyMatcher = '([^",{}\\s]+?)';
         const valMatcher = "(.,*)";
         const matcher = new RegExp(`${keyMatcher}\\s*:\\s*${valMatcher}`, "g");
         const parser = (match, key, value) => `"${key}":${value}`;
-        return input.replace(matcher, parser);
+        return input_without_last_semicolon.replace(matcher, parser);
     }
 
     function serve() {
@@ -195,8 +193,25 @@ module.exports = function () {
         }
     }
 
+    function load_config_file(config_path) {
+        let is_js_file = config_path.slice(-3) === ".js"; //otherwise is_json_file
+        const config_data = fs.readFileSync(config_path, {
+            encoding: "utf8",
+            flag: "r",
+        });
+        const config_data_only = is_js_file ? toJSONString(config_data) : config_data;
+        return JSON.parse(config_data_only);
+    }
+
+    function save_config_file(config, config_path) {
+        let is_js_file = config_path.slice(-3) === ".js"; //otherwise is_json_file
+        const output_code = JSON.stringify(config);
+        const output_code_module = is_js_file ? `module.exports = ${output_code};` : output_code;
+        fs.writeFileSync(config_path, output_code_module);
+    }
+
     function get_options() {
-        const config = require(config_path);
+        const config = load_config_file(config_path);
         return {
             mockups: [],
             output: "html",

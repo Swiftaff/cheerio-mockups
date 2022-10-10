@@ -4,17 +4,19 @@
 
 If you want to demonstrate a minor change to an existing site (change text or colour of a button, repositioning new elements, perhaps doing multiple variants to find the best approach or for client approvals) then typically you can do that in a couple of ways:
 
-1. use browser developer tools to edit the markup and styles temporarily - but those changes are easily lost, and not easily saved for later - and need to be noted separately or just forgotten and redone
-1. more permanently you can copying an existing page's html locally, fix any issues with files not working locally, make the actual changes manually on top of the original file, and copy/paste multiple copies - and litter the original file with comments so you can later recall what changes have been made
+1. use browser developer tools to edit the markup and styles temporarily - but those changes are easily lost - and need to be noted separately or just forgotten and redone
+1. more permanently you can copy an existing page's html locally, fix any issues with files not working locally, make the actual changes manually on top of the original file, and copy/paste multiple copies - and litter the original file with comments so you can later recall what changes have been made
+1. or just go in and make the final changes in the codebase, and build, commit, deploy or whatever it takes to preview it
 
-Instead, this library keeps the original intact, and applies a list of changes from a js file so it is VERY easy to undo changes, and try new variants. Any new html or inline styles can easily be loaded in from html snippets.
+Instead, this library keeps the original intact, and applies a list of changes from a js file on-the-fly so it is VERY easy to undo changes, and try new variants. Any new html or inline styles can easily be loaded in from html snippets.
 
 ## How?
 
 -   The separate Single-filez makes copying an entire existing page easy
 -   Cheerio makes updating static html easy like jQuery (refer to older version for commands: https://github.com/cheeriojs/cheerio/tree/aa90399c9c02f12432bfff97b8f1c7d8ece7c307)
 -   Playwright makes taking screengrabs easy
--   This library just auto-builds each mockup based on a 'mockups.js' definition file, and creates a hot reloading web socket sirv server to develop with
+-   This library just auto-builds each mockup based on a 'mockups_config.js' or 'mockups_config.json' definition file, and creates a hot reloading web socket sirv server to develop with
+-   additionally it provides an interface to easily find selectors and apply changes to auto-update the config file
 
 ## Instructions
 
@@ -46,11 +48,14 @@ module.exports = {
 };
 ```
 
-1. in `src` create an `index.js` file, calling the library and referencing the config file.
+1. or create a `mockups_config.json` file without the leading `module.exports = ` or trailing `;`
+1. if both a `.js` and `.json` file exists, `.js` is preferred and used - just because it's possible to comment out sections of the module if needed!
+
+1. also in `src` create an `index.js` file, calling the library, which will automatically pull in the config file.
 
 ```
 const mockups = require("cheerio-mockups");
-mockups("src/mockups_config.js");
+mockups();
 ```
 
 ### Save the original page from the site you wish to base the mockups from
@@ -69,14 +74,14 @@ mockups("src/mockups_config.js");
 ### Run the dev server and start making one or more mockup variants of the page using [https://cheerio.js.org/](cheerio.js) script
 
 1. Start development server `node src/index.js`
-1. open `http://localhost:3000/original.html` in browser to check html server is running and the original page still looks ok
+1. open `http://localhost:3000` in browser to check html server is running and the original page still looks ok
 1. Now is a good time to `git init` and commit your changes before continuing
-1. Edit the `src/mockups_config.js` file to define the changes you want to make for one or more mockups, and open those urls in a browser, e.g. `http://localhost:3000/mockup1.html`
+1. Edit the `src/mockups_config.js` (or `.json`) file to define the changes you want to make for one or more mockups, and open those urls in a browser, e.g. `http://localhost:3000/mockup1.html`
+1. alternatively in the index of localhost is a basic interface to make edits and view each mockup, as well as view at various device widths
 
     ```js
     module.exports = {
         // general settings
-        input: "src",
         output: "html",
         original: "original.html",
 
@@ -120,7 +125,6 @@ mockups("src/mockups_config.js");
     ```
 
 1. Saving this or any files in the 'src' folder should hot reload the browser
-1. TODO auto-create index page to link mockups from
 
 ### Use the resulting HTML mockups
 
